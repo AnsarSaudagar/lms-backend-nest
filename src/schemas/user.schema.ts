@@ -7,7 +7,7 @@ export type UserDocument = User & Document;
   timestamps: true,
   versionKey: false,
 })
-export class User {
+export class User extends Document {
   @Prop({
     type: Types.ObjectId,
   })
