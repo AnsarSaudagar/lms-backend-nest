@@ -14,7 +14,12 @@ export class ErrorLoggerService {
     private errorLoggerModel: Model<ErrorLoggerDocument>,
   ) {}
 
-  async addErrorLog(errorData: AddErrorLogDto){
-    return await this.errorLoggerModel.create(errorData);
+  async addErrorLog(errorData: AddErrorLogDto) {
+    const error = await this.errorLoggerModel.create(errorData);
+    return error;
+  }
+
+  async getErrors() {
+    return await this.errorLoggerModel.find();
   }
 }

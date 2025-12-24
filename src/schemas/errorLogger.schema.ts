@@ -24,7 +24,7 @@ export class ErrorLogger extends Document {
   user_id: Types.ObjectId;
 
   @Prop({
-    required: true,
+    // required: true,
   })
   url: string;
 
