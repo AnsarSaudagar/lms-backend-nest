@@ -47,6 +47,9 @@ export class User extends Document {
   })
   password: string;
 
+  @Prop()
+  mobileNumber: number;
+
   @Prop({
     index: true,
     enum: ['LEARNER', 'ADMIN'],
