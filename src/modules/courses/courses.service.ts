@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { COURSE_STATUS, CourseStatus } from 'src/common/constants/course-status.constant';
+import {
+  COURSE_STATUS,
+  CourseStatus,
+} from 'src/common/constants/course-status.constant';
 import { Course, CourseDocument } from 'src/schemas/courses.schema';
 import { FindProductFilter } from './dtos/find-product-filter';
 
@@ -53,11 +56,11 @@ export class CoursesService {
     return course;
   }
 
-    async updateStatus(courseId: string, status:  CourseStatus): Promise<Course>{
-      return await this.update(courseId, { status });
-    }
+  async updateStatus(courseId: string, status: CourseStatus): Promise<Course> {
+    return await this.update(courseId, { status });
+  }
 
-    async delete(courseId: string): Promise<void> {
+  async delete(courseId: string): Promise<void> {
     const result = await this.courseModel.findByIdAndDelete(courseId);
 
     if (!result) {
