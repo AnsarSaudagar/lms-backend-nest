@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Types } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { User } from './user.schema';
 import { Schema as MongooseSchema } from 'mongoose';
 
@@ -9,11 +9,7 @@ export type ErrorLoggerDocument = ErrorLogger & Document;
   timestamps: true,
   versionKey: false,
 })
-export class ErrorLogger {
-  @Prop({
-    type: Types.ObjectId,
-  })
-  _id: Types.ObjectId;
+export class ErrorLogger extends Document {
 
   @Prop({
     required: true,

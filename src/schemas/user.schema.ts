@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Types } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type UserDocument = User & Document;
 
@@ -8,10 +8,6 @@ export type UserDocument = User & Document;
   versionKey: false,
 })
 export class User extends Document {
-  @Prop({
-    type: Types.ObjectId,
-  })
-  _id: Types.ObjectId;
 
   @Prop({
     required: true,
