@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { InfrastructureModule } from './modules/infrastructure/infrastructure.module';
+import { CoursesModule } from './modules/courses/courses.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { InfrastructureModule } from './modules/infrastructure/infrastructure.mo
     AuthModule,
     UsersModule,
     DatabaseModule,
-    InfrastructureModule
+    InfrastructureModule,
+    CoursesModule
   ],
   controllers: [AppController],
   providers: [
