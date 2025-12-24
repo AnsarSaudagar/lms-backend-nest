@@ -8,6 +8,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { DatabaseModule } from './database/database.module';
+import { InfrastructureModule } from './modules/infrastructure/infrastructure.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { DatabaseModule } from './database/database.module';
     }),
     AuthModule,
     UsersModule,
-    DatabaseModule
+    DatabaseModule,
+    InfrastructureModule
   ],
   controllers: [AppController],
   providers: [
