@@ -1,8 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import {
-  COURSE_STATUS,
-  type CourseStatus,
-} from 'src/common/constants/course-status.constant';
+import { TOPIC_STATUS, type TopicStatus } from 'src/common/constants/topic-status.constant';
 
 @Schema({ _id: false })
 export class Topic {
@@ -16,13 +13,11 @@ export class Topic {
   description?: string;
 
   @Prop({
-    enum: Object.values(COURSE_STATUS),
-    default: COURSE_STATUS.DRAFT,
+    enum: Object.values(TOPIC_STATUS),
+    default: TOPIC_STATUS.DRAFT,
     index: true,
   })
-  status: CourseStatus;
-
-  
+  status: TopicStatus;
 }
 
 export const TopicSchema = SchemaFactory.createForClass(Topic);
