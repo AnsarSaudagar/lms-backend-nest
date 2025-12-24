@@ -1,16 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ErrorLoggerModule } from './error-logger/error-logger.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-store';
+import KeyvRedis from '@keyv/redis';
 
 @Module({
   imports: [ErrorLoggerModule,
     CacheModule.registerAsync({
       isGlobal: true,
       useFactory: () => ({
-        stores: redisStore,
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
+        stores: new KeyvRedis('redis://localhost:6379'),
         ttl: 60, // seconds
       })
     })
