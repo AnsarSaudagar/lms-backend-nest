@@ -13,8 +13,9 @@ export class ErrorLogger extends Document {
 
   @Prop({
     required: true,
+    type: MongooseSchema.Types.Mixed,
   })
-  message: string;
+  message: any;
 
   @Prop({
     type: Types.ObjectId,

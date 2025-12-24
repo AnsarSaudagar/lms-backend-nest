@@ -5,12 +5,16 @@ import {
   HttpException,
   HttpStatus,
   Logger,
+  Injectable,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { ErrorLoggerService } from 'src/modules/infrastructure/error-logger/error-logger.service';
 
 @Catch()
+@Injectable()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
+  constructor(private readonly errorLoggerService: ErrorLoggerService) {}
 
   catch(exception: unknown, host: ArgumentsHost) {
     this.logger.error(exception);
@@ -31,6 +35,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
     } else {
       errorResponse = { message: 'Internal server error' };
     }
+    this.errorLoggerService.addErrorLog({
+        message: errorResponse,
+        url: '',
+        host: 'localhost',
+        body: {},
+        user_id: ''
+    })
 
     response.status(status).json({
       statusCode: status,
