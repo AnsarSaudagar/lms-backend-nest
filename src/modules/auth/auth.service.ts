@@ -45,9 +45,13 @@ export class AuthService {
     return safeUser;
   }
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string, userRole: String ) {
     const user: User | null = await this.usersService.findByEmail(email);
     if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    if(user.role !== userRole){
       throw new UnauthorizedException();
     }
 
