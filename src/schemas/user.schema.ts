@@ -43,7 +43,7 @@ export class User extends Document {
 
   @Prop({
     required: true,
-    select: false,
+    // select: false,
   })
   password: string;
 
