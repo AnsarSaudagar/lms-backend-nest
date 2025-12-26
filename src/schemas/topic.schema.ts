@@ -6,7 +6,7 @@ export class Topic {
   @Prop({ required: true, trim: true })
   name: string;
 
-  @Prop({ default: null })
+  @Prop({ type: String, default: null })
   image?: string | null;
 
   @Prop({ trim: true })
