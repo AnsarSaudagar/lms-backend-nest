@@ -1,13 +1,30 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { CoursesService } from './courses.service';
-import type { NewCourseDto } from './dtos/newCourse.dto';
+import { type NewCourseDto } from './dtos/newCourse.dto';
 
 @Controller('courses')
 export class CoursesController {
-  constructor(private readonly coursesService: CoursesService) { }
+  constructor(private readonly coursesService: CoursesService) {}
 
   @Post()
-  create(@Body() course: NewCourseDto) {
+  createCourse(@Body() createCourseDto: NewCourseDto) {
+    return this.coursesService.create(createCourseDto);
+  }
 
+  @Get()
+  findAllCourses() {
+    return this.coursesService.findAll();
+  }
+
+  @Get(':id')
+  findCourseById(@Param('id', ParseUUIDPipe) id: string) {
+    return this.coursesService.findById(id);
   }
 }
