@@ -1,7 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
 
 @Injectable()
 export class GeminiService {
@@ -23,10 +22,6 @@ export class GeminiService {
             const result = await model.generateContent(prompt);
             return result.response.text();
         } catch (error) {
-            // If we hit a rate limit and have retries left
-            if (error.message?.includes('429') && retries > 0) {
-                console.log(`Rate limit hit. Retrying in 5 seconds... (${retries} attempts left)`);
-            }
             throw error;
         }
     }
