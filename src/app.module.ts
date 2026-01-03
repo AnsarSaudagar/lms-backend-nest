@@ -10,6 +10,7 @@ import { UsersModule } from './modules/users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { InfrastructureModule } from './modules/infrastructure/infrastructure.module';
 import { CoursesModule } from './modules/courses/courses.module';
+import { GeminiService } from './gemini/gemini.service';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { CoursesModule } from './modules/courses/courses.module';
     UsersModule,
     DatabaseModule,
     InfrastructureModule,
-    CoursesModule
+    CoursesModule,
   ],
   controllers: [AppController],
   providers: [
@@ -30,6 +31,7 @@ import { CoursesModule } from './modules/courses/courses.module';
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
     },
+    GeminiService
   ],
 })
 export class AppModule {}
