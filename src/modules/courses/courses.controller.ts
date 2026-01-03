@@ -30,7 +30,7 @@ export class CoursesController {
   }
 
   @Delete(':id')
-  deleteCourseById(@Param('id', ParseUUIDPipe) id: string){
+  deleteCourseById(@Param('id') id: string){
     return this.coursesService.delete(id);
   }
 }

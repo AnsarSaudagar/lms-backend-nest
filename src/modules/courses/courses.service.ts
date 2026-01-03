@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { isValidObjectId, Model, Types } from 'mongoose';
 import {
   COURSE_STATUS,
   CourseStatus,
@@ -13,7 +13,7 @@ export class CoursesService {
   constructor(
     @InjectModel(Course.name)
     private readonly courseModel: Model<CourseDocument>,
-  ) {}
+  ) { }
 
   async create(data: Partial<Course>): Promise<Course> {
     const course = new this.courseModel({
@@ -61,6 +61,11 @@ export class CoursesService {
   }
 
   async delete(courseId: string): Promise<void> {
+
+    if (!isValidObjectId(courseId)) {
+      throw new BadRequestException('Invalid MongoDB ObjectId');
+    }
+
     const result = await this.courseModel.findByIdAndDelete(courseId);
 
     if (!result) {
