@@ -5,6 +5,7 @@ import {
   Param,
   Post,
   ParseUUIDPipe,
+  Delete
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { type NewCourseDto } from './dtos/newCourse.dto';
@@ -26,5 +27,10 @@ export class CoursesController {
   @Get(':id')
   findCourseById(@Param('id', ParseUUIDPipe) id: string) {
     return this.coursesService.findById(id);
+  }
+
+  @Delete(':id')
+  deleteCourseById(@Param('id', ParseUUIDPipe) id: string){
+    return this.coursesService.delete(id);
   }
 }

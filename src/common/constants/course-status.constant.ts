@@ -1,7 +1,7 @@
 export const COURSE_STATUS = {
-    DRAFT: 'DRAFT',
-    PUBLISHED: 'PUBLISHED',
-    INACTIVE: 'INACTIVE',
-    REJECTED: 'REJECTED'
+    DRAFT: 'Draft',
+    PUBLISHED: 'Published',
+    INACTIVE: 'In-active',
+    REJECTED: 'Rejected'
 } as const;
 export type CourseStatus = (typeof COURSE_STATUS)[keyof typeof COURSE_STATUS];
