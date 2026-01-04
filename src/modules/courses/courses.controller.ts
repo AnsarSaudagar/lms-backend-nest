@@ -25,7 +25,7 @@ export class CoursesController {
   }
 
   @Get(':id')
-  findCourseById(@Param('id', ParseUUIDPipe) id: string) {
+  findCourseById(@Param('id') id: string) {
     return this.coursesService.findById(id);
   }
 
