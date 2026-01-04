@@ -12,6 +12,9 @@ export class Topic {
   @Prop({ trim: true })
   description?: string;
 
+  @Prop()
+  shortDescription: string;
+
   @Prop({
     type: Number,
     required: true,
