@@ -3,6 +3,8 @@ import { CoursesService } from './courses.service';
 import { CoursesController } from './courses.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Course, CourseSchema } from 'src/schemas/courses.schema';
+import { TopicsController } from './topics/topics.controller';
+import { TopicsService } from './topics/topics.service';
 
 @Module({
   imports: [
@@ -10,7 +12,7 @@ import { Course, CourseSchema } from 'src/schemas/courses.schema';
       {name: Course.name, schema: CourseSchema}
     ])
   ],
-  controllers: [CoursesController],
-  providers: [CoursesService],
+  controllers: [CoursesController, TopicsController],
+  providers: [CoursesService, TopicsService],
 })
 export class CoursesModule {}
