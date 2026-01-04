@@ -5,10 +5,12 @@ import {
   Param,
   Post,
   ParseUUIDPipe,
-  Delete
+  Delete,
+  Put
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { type NewCourseDto } from './dtos/newCourse.dto';
+import { Course } from 'src/schemas/courses.schema';
 
 @Controller('courses')
 export class CoursesController {
@@ -27,6 +29,11 @@ export class CoursesController {
   @Get(':id')
   findCourseById(@Param('id') id: string) {
     return this.coursesService.findById(id);
+  }
+
+  @Put(":id")
+  updateCourse(@Param('id') id: string, @Body() updateCourse: Partial<Course>){
+    return this.coursesService.update(id, updateCourse);
   }
 
   @Delete(':id')

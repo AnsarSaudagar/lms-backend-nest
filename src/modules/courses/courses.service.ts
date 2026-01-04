@@ -46,6 +46,11 @@ export class CoursesService {
   }
 
   async update(courseId: string, data: Partial<Course>) {
+
+    if (!isValidObjectId(courseId)) {
+      throw new BadRequestException('Invalid MongoDB ObjectId');
+    }
+
     const course = await this.courseModel.findByIdAndUpdate(courseId, {
       $set: data,
       new: true,
