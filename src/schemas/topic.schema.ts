@@ -1,10 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { TOPIC_STATUS, type TopicStatus } from 'src/common/constants/topic-status.constant';
 
-@Schema()
+@Schema({
+  timestamps: true,
+  versionKey: false,
+})
 export class Topic {
   @Prop({ required: true, trim: true })
-  name: string;
+  title: string;
 
   @Prop({ type: String, default: null })
   image?: string | null;
@@ -12,7 +15,7 @@ export class Topic {
   @Prop({ trim: true })
   description?: string;
 
-  @Prop()
+  @Prop({ type: String, default: null })
   shortDescription: string;
 
   @Prop({
@@ -29,7 +32,7 @@ export class Topic {
 
   @Prop({
     enum: Object.values(TOPIC_STATUS),
-    default: TOPIC_STATUS.DRAFT,
+    default: TOPIC_STATUS.ACTIVE,
     index: true,
   })
   status: TopicStatus;

@@ -1,4 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { Course } from 'src/schemas/courses.schema';
+import { CoursesService } from '../courses.service';
+import { CreateNewTopicDto } from './dtos/createNewTopic.dto';
 
 @Injectable()
-export class TopicsService {}
+export class TopicsService {
+    constructor(
+        @InjectModel(Course.name)
+        private readonly courseModel: Model<Course>,
+        private readonly courseService: CoursesService
+    ) { }
+
+    async addTopic(courseId: string, topic: CreateNewTopicDto) {
+        if (!Types.ObjectId.isValid(courseId)) {
+            throw new NotFoundException('Course not found');
+        }
+
+        const course = await this.courseModel.findByIdAndUpdate(
+            courseId,
+            { $push: { topics: topic } },
+            { new: true },
+        );
+
+        if (!course) {
+            throw new NotFoundException('Course not found');
+        }
+
+        return course;
+    }
+
+
+}
