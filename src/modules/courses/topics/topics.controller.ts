@@ -4,13 +4,8 @@ import type { CreateNewTopicDto } from './dtos/createNewTopic.dto';
 
 @Controller('/courses/:id/topics')
 export class TopicsController {
-
-    constructor(private readonly topicService: TopicsService){}
-
-    @Get()
-    get(){
-        return "ansar"
-    }    
+    
+    constructor(private readonly topicService: TopicsService){} 
 
     @Post()
     addTopic(@Param('id') courseId: string, @Body() createNewTopic: CreateNewTopicDto){
