@@ -6,12 +6,15 @@ import {
   Post,
   ParseUUIDPipe,
   Delete,
-  Put
+  Put,
+  UseGuards
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { type NewCourseDto } from './dtos/newCourse.dto';
 import { Course } from 'src/schemas/courses.schema';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('courses')
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
