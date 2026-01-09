@@ -34,6 +34,13 @@ export class Category {
     })
     isActive : boolean
 
+    @Prop({
+        type: Number
+    })
+    coursesCount: number;
+
+    @Prop()
+    icon: string;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
