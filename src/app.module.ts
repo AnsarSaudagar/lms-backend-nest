@@ -11,6 +11,7 @@ import { DatabaseModule } from './database/database.module';
 import { InfrastructureModule } from './modules/infrastructure/infrastructure.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { GeminiService } from './gemini/gemini.service';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { GeminiService } from './gemini/gemini.service';
     DatabaseModule,
     InfrastructureModule,
     CoursesModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [
