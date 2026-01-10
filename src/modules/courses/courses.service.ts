@@ -9,6 +9,7 @@ import { Course, CourseDocument } from 'src/schemas/courses.schema';
 import { FindProductFilter } from './dtos/find-product-filter';
 import { CategoryService } from '../categories/categories.service';
 import { Category } from 'src/schemas/categories.schema';
+import { DIFFICULTY_LEVEL } from 'src/common/constants/difficulty-level.constant';
 
 @Injectable()
 export class CoursesService {
@@ -36,24 +37,31 @@ export class CoursesService {
     return await this.courseModel.find(query).sort({ createdAt: -1 }).lean();
   }
 
-  async findById(courseId: string): Promise<{ course: Course; categories: Category[]; }> {
+  async findById(courseId: string): Promise<{
+    course: Course;
+    categories: Category[];
+    difficultyLevel: typeof DIFFICULTY_LEVEL;
+  }> {
     if (!Types.ObjectId.isValid(courseId)) {
       throw new NotFoundException('Course not found');
     }
 
-    const course = await this.courseModel.findById(courseId);
+    const [course, categories] = await Promise.all([
+      this.courseModel.findById(courseId).lean().exec(),
+      this.categoryService.findAll(),
+    ]);
 
-    const allCategories = await this.categoryService.findAll();
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
 
-    if (!course) throw new NotFoundException('Course not found');
-
-    const res : {course: Course, categories: Category[]} = {
-      course: course,
-      categories: allCategories
+    return {
+      course,
+      categories,
+      difficultyLevel: DIFFICULTY_LEVEL
     };
-
-    return res;
   }
+
 
   async update(courseId: string, data: Partial<Course>) {
 

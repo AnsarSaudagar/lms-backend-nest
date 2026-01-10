@@ -5,7 +5,7 @@ import {
   type CourseStatus,
 } from 'src/common/constants/course-status.constant';
 import { Topic, TopicSchema } from './topic.schema';
-import { DIFFICULTY_LEVEL, type DiffucultyLevel } from 'src/common/constants/difficulty-level.constant';
+import { DIFFICULTY_LEVEL, type DifficultyLevel } from 'src/common/constants/difficulty-level.constant';
 
 export type CourseDocument = HydratedDocument<Course>;
 
@@ -52,7 +52,7 @@ export class Course {
     default: DIFFICULTY_LEVEL.BEGINNER,
     enum: Object.values(DIFFICULTY_LEVEL),
   })
-  difficutyLevel: DiffucultyLevel;
+  difficutyLevel: DifficultyLevel;
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);
