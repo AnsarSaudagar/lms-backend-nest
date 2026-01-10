@@ -10,6 +10,7 @@ import { FindProductFilter } from './dtos/find-product-filter';
 import { CategoryService } from '../categories/categories.service';
 import { Category } from 'src/schemas/categories.schema';
 import { DIFFICULTY_LEVEL } from 'src/common/constants/difficulty-level.constant';
+import { CourseDetailsDto } from './dtos/course-details.dto';
 
 @Injectable()
 export class CoursesService {
@@ -37,11 +38,7 @@ export class CoursesService {
     return await this.courseModel.find(query).sort({ createdAt: -1 }).lean();
   }
 
-  async findById(courseId: string): Promise<{
-    course: Course;
-    categories: Category[];
-    difficultyLevel: typeof DIFFICULTY_LEVEL;
-  }> {
+  async findById(courseId: string): Promise<CourseDetailsDto> {
     if (!Types.ObjectId.isValid(courseId)) {
       throw new NotFoundException('Course not found');
     }
