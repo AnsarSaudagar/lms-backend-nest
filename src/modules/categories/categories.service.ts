@@ -4,6 +4,7 @@ import { Model, Types } from 'mongoose';;
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category, CategoryDocument } from 'src/schemas/categories.schema';
+import { slugify } from 'src/common/utils/slugify';
 
 @Injectable()
 export class CategoryService {
@@ -13,9 +14,12 @@ export class CategoryService {
   ) { }
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
+    const slug : string = slugify(createCategoryDto.name);
+
     const category = new this.categoryModel({
       ...createCategoryDto,
       coursesCount: 0,
+      slug: slug
     });
 
     return category.save();
