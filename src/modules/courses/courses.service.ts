@@ -7,12 +7,15 @@ import {
 } from 'src/common/constants/course-status.constant';
 import { Course, CourseDocument } from 'src/schemas/courses.schema';
 import { FindProductFilter } from './dtos/find-product-filter';
+import { CategoryService } from '../categories/categories.service';
+import { Category } from 'src/schemas/categories.schema';
 
 @Injectable()
 export class CoursesService {
   constructor(
     @InjectModel(Course.name)
     private readonly courseModel: Model<CourseDocument>,
+    private readonly categoryService: CategoryService
   ) { }
 
   async create(data: Partial<Course>): Promise<Course> {
@@ -33,16 +36,23 @@ export class CoursesService {
     return await this.courseModel.find(query).sort({ createdAt: -1 }).lean();
   }
 
-  async findById(courseId: string): Promise<Course> {
+  async findById(courseId: string): Promise<{ course: Course; categories: Category[]; }> {
     if (!Types.ObjectId.isValid(courseId)) {
       throw new NotFoundException('Course not found');
     }
 
     const course = await this.courseModel.findById(courseId);
 
+    const allCategories = await this.categoryService.findAll();
+
     if (!course) throw new NotFoundException('Course not found');
 
-    return course;
+    const res : {course: Course, categories: Category[]} = {
+      course: course,
+      categories: allCategories
+    };
+
+    return res;
   }
 
   async update(courseId: string, data: Partial<Course>) {
