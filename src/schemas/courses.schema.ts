@@ -43,7 +43,8 @@ export class Course {
   @Prop({
     type: Number,
     required: true,
-    min: 0
+    min: 0,
+    default: 0
   })
   price: number;
 
