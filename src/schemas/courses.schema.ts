@@ -49,11 +49,12 @@ export class Course {
   price: number;
 
   @Prop({
+    type: String,
     index: true,
-    default: Object.keys(DIFFICULTY_LEVEL)[0],
-    enum: Object.values(DIFFICULTY_LEVEL),
+    enum: Object.keys(DIFFICULTY_LEVEL),
+    default: 'BEGINNER',
   })
-  difficutyLevel: DifficultyLevel;
+  difficultyLevel: string;
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);

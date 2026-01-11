@@ -65,11 +65,15 @@ export class CoursesService {
     if (!isValidObjectId(courseId)) {
       throw new BadRequestException('Invalid MongoDB ObjectId');
     }
-
-    const course = await this.courseModel.findByIdAndUpdate(courseId, {
-      $set: data,
-      new: true,
-    });
+    
+    const course = await this.courseModel.findByIdAndUpdate(
+      courseId,
+      { $set: data },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
 
     if (!course) throw new NotFoundException('Course not found');
 

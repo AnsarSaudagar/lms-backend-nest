@@ -5,4 +5,4 @@ export const DIFFICULTY_LEVEL = {
 } as const;
 
 export type DifficultyLevel =
-  typeof DIFFICULTY_LEVEL[keyof typeof DIFFICULTY_LEVEL];
+  keyof typeof DIFFICULTY_LEVEL;
