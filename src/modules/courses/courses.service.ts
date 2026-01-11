@@ -29,7 +29,7 @@ export class CoursesService {
     return await course.save();
   }
 
-  async findAll(filter?: FindProductFilter): Promise<Course[]> {
+  async findAll(filter?: FindProductFilter): Promise<Partial<Course>[]> {
     const query: any = {};
 
     if (filter?.status) query.status = filter.status;
@@ -42,13 +42,20 @@ export class CoursesService {
         path: 'category',
         select: 'name',
       })
-      .lean() 
+      .lean()
       .exec();
 
-    return courses.map((course: Course) => ({
-      ...course,
-      category: (course.category as any)?.name ?? null,
-    }));
+    return courses.map((course: Course) => {
+      const topicsCount = course.topics ?  course.topics.length : 0;
+      const { topics, ...rest } = course;
+
+      return {
+        ...rest,
+        duration: this.calculateCourseDuration(course),
+        category: (course.category as any)?.name ?? null,
+        topicsCount : topicsCount
+      };
+    });
   }
 
   async findById(courseId: string): Promise<CourseDetailsDto> {
@@ -108,5 +115,19 @@ export class CoursesService {
     if (!result) {
       throw new NotFoundException('Course not found');
     }
+  }
+
+  private calculateCourseDuration(course: Course){
+    if (!course) return 0;
+
+    let duration = 0;
+
+    if(!course.topics) return 0;
+    
+    course.topics.forEach(topic => {
+      duration += topic.duration;
+    });
+
+    return duration;
   }
 }
