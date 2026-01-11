@@ -50,7 +50,7 @@ export class Course {
 
   @Prop({
     index: true,
-    default: DIFFICULTY_LEVEL.BEGINNER,
+    default: Object.keys(DIFFICULTY_LEVEL)[0],
     enum: Object.values(DIFFICULTY_LEVEL),
   })
   difficutyLevel: DifficultyLevel;
