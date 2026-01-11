@@ -6,6 +6,7 @@ import {
 } from 'src/common/constants/course-status.constant';
 import { Topic, TopicSchema } from './topic.schema';
 import { DIFFICULTY_LEVEL, type DifficultyLevel } from 'src/common/constants/difficulty-level.constant';
+import { Category } from './categories.schema';
 
 export type CourseDocument = HydratedDocument<Course>;
 
@@ -55,6 +56,13 @@ export class Course {
     default: 'BEGINNER',
   })
   difficultyLevel: string;
+
+  @Prop({
+    type: Types.ObjectId,
+    ref: Category.name,
+    required: true
+  })
+  category: Types.ObjectId;
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);
