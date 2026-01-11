@@ -32,10 +32,23 @@ export class CoursesService {
   async findAll(filter?: FindProductFilter): Promise<Course[]> {
     const query: any = {};
 
-    if (filter && filter?.status) query.status = filter.status;
-    if (filter && filter?.search) query.$text = filter.search;
+    if (filter?.status) query.status = filter.status;
+    if (filter?.search) query.$text = { $search: filter.search };
 
-    return await this.courseModel.find(query).sort({ createdAt: -1 }).lean();
+    const courses = await this.courseModel
+      .find(query)
+      .sort({ createdAt: -1 })
+      .populate({
+        path: 'category',
+        select: 'name',
+      })
+      .lean() 
+      .exec();
+
+    return courses.map((course: Course) => ({
+      ...course,
+      category: (course.category as any)?.name ?? null,
+    }));
   }
 
   async findById(courseId: string): Promise<CourseDetailsDto> {
