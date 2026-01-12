@@ -29,6 +29,9 @@ export class ErrorLogger extends Document {
   url: string;
 
   @Prop()
+  type: string;
+
+  @Prop()
   browser: string;
 
   @Prop()

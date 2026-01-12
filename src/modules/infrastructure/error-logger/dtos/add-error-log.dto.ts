@@ -4,6 +4,7 @@ export interface AddErrorLogDto {
   message: any;
   user_id?: string;
   url?: string;
+  type?: string;
   browser?: string;
   stack?: string;
   method?: string;
