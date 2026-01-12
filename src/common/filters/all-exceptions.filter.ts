@@ -58,7 +58,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     // ---------- LOG OBJECT ----------
     const errorLogPayload: any = {
-      message: errorMessage,
+      message: errorMessage.message,
       user_id: userId,
       url: request.originalUrl,
       browser: request.headers['user-agent'],
