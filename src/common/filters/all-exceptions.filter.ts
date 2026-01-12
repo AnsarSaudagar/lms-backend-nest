@@ -10,7 +10,7 @@ import {
 import { Request, Response } from 'express';
 import { ErrorLoggerService } from 'src/modules/infrastructure/error-logger/error-logger.service';
 import { Types } from 'mongoose';
-import { AddErrorLogDto } from 'src/modules/infrastructure/error-logger/dtos/add-error-log.dto';
+import { buildRequestPayload } from '../utils/payload.util';
 
 @Catch()
 @Injectable()
@@ -67,6 +67,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       host: request.hostname,
       ip,
       body: this.sanitizeBody(request.body),
+      payload: buildRequestPayload(request)
     };
 
     // ---------- SAVE TO DB ----------
