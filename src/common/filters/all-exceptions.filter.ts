@@ -11,6 +11,7 @@ import { Request, Response } from 'express';
 import { ErrorLoggerService } from 'src/modules/infrastructure/error-logger/error-logger.service';
 import { Types } from 'mongoose';
 import { buildRequestPayload } from '../utils/payload.util';
+import { UAParser } from 'ua-parser-js';
 
 @Catch()
 @Injectable()
@@ -61,7 +62,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message: errorMessage.message,
       user_id: userId,
       url: request.originalUrl,
-      browser: request.headers['user-agent'],
+      browser: this.extractBrowserShort(request.headers['user-agent']),
       stack,
       method: request.method,
       host: request.hostname,
@@ -119,5 +120,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     // 3️⃣ Fallback
     return 'UnknownError';
+  }
+
+  private extractBrowserShort(userAgent?: string): string {
+    if (!userAgent) return 'Unknown';
+
+    const parser = new UAParser(userAgent);
+    const result = parser.getResult();
+
+    const browser = result.browser.name ?? 'Unknown';
+    const version = result.browser.major ?? '';
+
+    return version ? `${browser} ${version}` : browser;
   }
 }
