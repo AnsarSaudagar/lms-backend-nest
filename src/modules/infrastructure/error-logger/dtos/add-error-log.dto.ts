@@ -10,4 +10,5 @@ export interface AddErrorLogDto {
   host?: string;
   ip?: string;
   body?: any;
+  payload ?: any;
 }

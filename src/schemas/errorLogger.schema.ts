@@ -43,6 +43,10 @@ export class ErrorLogger extends Document {
   @Prop()
   ip : string;
 
+  @Prop({
+    type: MongooseSchema.Types.Mixed
+  })
+  payload: any;
 }
 
 export const ErrorLoggerSchema = SchemaFactory.createForClass(ErrorLogger);
