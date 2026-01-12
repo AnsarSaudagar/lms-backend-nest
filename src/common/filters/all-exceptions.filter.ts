@@ -43,7 +43,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // ---------- USER ID ----------
     const userId =
       (request as any)?.user?.id &&
-      Types.ObjectId.isValid((request as any).user.id)
+        Types.ObjectId.isValid((request as any).user.id)
         ? new Types.ObjectId((request as any).user.id)
         : null;
 
@@ -62,12 +62,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
       user_id: userId,
       url: request.originalUrl,
       browser: request.headers['user-agent'],
-      stack,  
+      stack,
       method: request.method,
       host: request.hostname,
       ip,
       body: this.sanitizeBody(request.body),
-      payload: buildRequestPayload(request)
+      payload: buildRequestPayload(request),
+      type: this.extractErrorType(exception)
     };
 
     // ---------- SAVE TO DB ----------
@@ -100,5 +101,23 @@ export class AllExceptionsFilter implements ExceptionFilter {
     });
 
     return cloned;
+  }
+
+  private extractErrorType(exception: unknown): string {
+    // 1️⃣ Native JS Error
+    if (exception instanceof Error) {
+      return exception.name;
+    }
+
+    // 2️⃣ Nest HttpException
+    if (
+      typeof exception === 'object' &&
+      exception?.constructor?.name
+    ) {
+      return exception.constructor.name;
+    }
+
+    // 3️⃣ Fallback
+    return 'UnknownError';
   }
 }
