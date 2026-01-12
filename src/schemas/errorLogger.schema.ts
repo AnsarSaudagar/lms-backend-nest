@@ -50,6 +50,11 @@ export class ErrorLogger extends Document {
     type: MongooseSchema.Types.Mixed
   })
   payload: any;
+  
+  @Prop({
+    default: 'danger'
+  })
+  severity: string;
 }
 
 export const ErrorLoggerSchema = SchemaFactory.createForClass(ErrorLogger);
