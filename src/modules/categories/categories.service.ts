@@ -4,7 +4,7 @@ import { Model, Types } from 'mongoose';;
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category, CategoryDocument } from 'src/schemas/categories.schema';
-import { slugify } from 'src/common/utils/slugify';
+import { slugify } from 'src/common/utils/slugify.util';
 
 @Injectable()
 export class CategoryService {
