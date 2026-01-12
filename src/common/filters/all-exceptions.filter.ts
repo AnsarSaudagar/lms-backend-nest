@@ -10,8 +10,7 @@ import {
 import { Request, Response } from 'express';
 import { ErrorLoggerService } from 'src/modules/infrastructure/error-logger/error-logger.service';
 import { Types } from 'mongoose';
-import { buildRequestPayload } from '../utils/payload.util';
-import { UAParser } from 'ua-parser-js';
+import { buildRequestPayload, extractBrowserShort, extractErrorType, sanitizeBody } from '../utils/error-handler.util';
 
 @Catch()
 @Injectable()
@@ -32,7 +31,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    // ---------- ERROR MESSAGE ----------
     let errorMessage: any;
     if (exception instanceof HttpException) {
       const res = exception.getResponse();
@@ -41,45 +39,39 @@ export class AllExceptionsFilter implements ExceptionFilter {
       errorMessage = { message: 'Internal server error' };
     }
 
-    // ---------- USER ID ----------
     const userId =
       (request as any)?.user?.id &&
         Types.ObjectId.isValid((request as any).user.id)
         ? new Types.ObjectId((request as any).user.id)
         : null;
 
-    // ---------- STACK TRACE ----------
     const stack =
       exception instanceof Error ? exception.stack : null;
 
-    // ---------- CLIENT IP ----------
     const ip =
       (request.headers['x-forwarded-for'] as string)?.split(',')[0] ||
       request.socket.remoteAddress;
 
-    // ---------- LOG OBJECT ----------
     const errorLogPayload: any = {
       message: errorMessage.message,
       user_id: userId,
       url: request.originalUrl,
-      browser: this.extractBrowserShort(request.headers['user-agent']),
+      browser: extractBrowserShort(request.headers['user-agent']),
       stack,
       method: request.method,
       host: request.hostname,
       ip,
-      body: this.sanitizeBody(request.body),
+      body: sanitizeBody(request.body),
       payload: buildRequestPayload(request),
-      type: this.extractErrorType(exception)
+      type: extractErrorType(exception)
     };
 
-    // ---------- SAVE TO DB ----------
     try {
       await this.errorLoggerService.addErrorLog(errorLogPayload);
     } catch (err) {
       this.logger.error('Failed to save error log', err);
     }
 
-    // ---------- RESPONSE ----------
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
@@ -87,50 +79,5 @@ export class AllExceptionsFilter implements ExceptionFilter {
       error: errorMessage,
     });
   }
-
-  /**
-   * Remove sensitive fields before logging
-   */
-  private sanitizeBody(body: any) {
-    if (!body || typeof body !== 'object') return body;
-
-    const cloned = { ...body };
-    const sensitiveKeys = ['password', 'confirmPassword', 'token'];
-
-    sensitiveKeys.forEach((key) => {
-      if (cloned[key]) cloned[key] = '***';
-    });
-
-    return cloned;
-  }
-
-  private extractErrorType(exception: unknown): string {
-    // 1️⃣ Native JS Error
-    if (exception instanceof Error) {
-      return exception.name;
-    }
-
-    // 2️⃣ Nest HttpException
-    if (
-      typeof exception === 'object' &&
-      exception?.constructor?.name
-    ) {
-      return exception.constructor.name;
-    }
-
-    // 3️⃣ Fallback
-    return 'UnknownError';
-  }
-
-  private extractBrowserShort(userAgent?: string): string {
-    if (!userAgent) return 'Unknown';
-
-    const parser = new UAParser(userAgent);
-    const result = parser.getResult();
-
-    const browser = result.browser.name ?? 'Unknown';
-    const version = result.browser.major ?? '';
-
-    return version ? `${browser} ${version}` : browser;
-  }
+ 
 }
