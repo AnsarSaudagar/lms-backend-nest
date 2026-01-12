@@ -29,15 +29,20 @@ export class ErrorLogger extends Document {
   url: string;
 
   @Prop()
+  browser: string;
+
+  @Prop()
+  stack: string;
+
+  @Prop()
   method: string;
 
   @Prop()
   host: string;
 
-  @Prop({
-    type: MongooseSchema.Types.Mixed,
-  })
-  body: any;
+  @Prop()
+  ip : string;
+
 }
 
 export const ErrorLoggerSchema = SchemaFactory.createForClass(ErrorLogger);
