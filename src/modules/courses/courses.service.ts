@@ -117,6 +117,10 @@ export class CoursesService {
     }
   }
 
+  async addImage(courseId: string, fileName: string): Promise<Course>{
+    return await this.update(courseId, {imageUrl: fileName});
+  }
+
   private calculateCourseDuration(course: Course){
     if (!course) return 0;
 

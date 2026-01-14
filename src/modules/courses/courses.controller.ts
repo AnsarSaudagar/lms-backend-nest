@@ -47,19 +47,20 @@ export class CoursesController {
     return this.coursesService.delete(id);
   }
 
-  @Post('image')
+  @Post('image/:id')
   @UseInterceptors(
     FileInterceptor('image', {
       storage: CloudinaryStorageConfig,
     }),
   )
-  uploadImage(@UploadedFile() file: any) {
+  uploadImage(@UploadedFile() file: any, @Param('id') id: string) {
     
-    
+    const course = this.coursesService.addImage(id, file.path);
     
     return {
       url: file.path,          // Cloudinary URL
       public_id: file.filename,
+      course
     };
   }
 }

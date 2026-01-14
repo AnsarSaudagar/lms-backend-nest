@@ -63,6 +63,11 @@ export class Course {
     required: true
   })
   category: Types.ObjectId;
+
+  @Prop({
+    default: null
+  })
+  imageUrl : string;
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);
