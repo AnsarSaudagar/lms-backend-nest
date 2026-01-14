@@ -6,12 +6,16 @@ import {
   Post,
   Delete,
   Put,
-  UseGuards
+  UseGuards,
+  UseInterceptors,
+  UploadedFile
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { type NewCourseDto } from './dtos/newCourse.dto';
 import { Course } from 'src/schemas/courses.schema';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CloudinaryStorageConfig } from 'src/config/cloudinary-storage';
 
 @UseGuards(JwtAuthGuard)
 @Controller('courses')
@@ -41,5 +45,21 @@ export class CoursesController {
   @Delete(':id')
   deleteCourseById(@Param('id') id: string){
     return this.coursesService.delete(id);
+  }
+
+  @Post('image')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: CloudinaryStorageConfig,
+    }),
+  )
+  uploadImage(@UploadedFile() file: any) {
+    
+    
+    
+    return {
+      url: file.path,          // Cloudinary URL
+      public_id: file.filename,
+    };
   }
 }
