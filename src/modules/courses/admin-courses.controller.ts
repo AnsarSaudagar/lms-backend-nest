@@ -18,7 +18,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryStorageConfig } from 'src/config/cloudinary-storage';
 
 @UseGuards(JwtAuthGuard)
-@Controller('admin-courses')
+@Controller('admin/courses')
 export class AdminCoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
