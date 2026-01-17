@@ -7,6 +7,7 @@ import { TopicsController } from './topics/topics.controller';
 import { TopicsService } from './topics/topics.service';
 import { CategoryService } from '../categories/categories.service';
 import { Category } from 'src/schemas/categories.schema';
+import { AdminCoursesController } from './admin-courses.controller';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { Category } from 'src/schemas/categories.schema';
       {name: Category.name, schema: CourseSchema},
     ])
   ],
-  controllers: [CoursesController, TopicsController],
+  controllers: [CoursesController, TopicsController, AdminCoursesController],
   providers: [CoursesService, TopicsService, CategoryService],
 })
 export class CoursesModule {}
