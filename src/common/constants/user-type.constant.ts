@@ -1,5 +1,5 @@
-export const LEARNER_KEY = 'Learner';
-export const ADMIN_KEY = 'Admin';
+export const LEARNER_KEY = 'LEARNER';
+export const ADMIN_KEY = 'ADMIN';
 export const USER_TYPE = {
     [ADMIN_KEY]: 'Admin',
     [LEARNER_KEY]: 'Learner'
