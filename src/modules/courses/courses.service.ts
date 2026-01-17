@@ -134,4 +134,11 @@ export class CoursesService {
 
     return duration;
   }
+
+  async findAllWithLimitedData(){
+    return this.courseModel
+        .find()
+        .select('title price imageUrl')
+        .exec();
+  } 
 }

@@ -85,3 +85,7 @@ CourseSchema.index({
   title: 'text',
   description: 'text',
 });
+
+CourseSchema.virtual('image').get(function(){
+  return this.imageUrl;
+});
