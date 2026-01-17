@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { DEFAULT_KEY, USER_TYPE } from 'src/common/constants/user-type.constant';
 
 export type UserDocument = User & Document;
 
@@ -52,8 +53,8 @@ export class User extends Document {
 
   @Prop({
     index: true,
-    enum: ['LEARNER', 'ADMIN'],
-    default: 'LEARNER',
+    enum: Object.keys(USER_TYPE),
+    default: DEFAULT_KEY,
   })
   role: string;
 
