@@ -60,7 +60,7 @@ export class Course {
   @Prop({
     type: Types.ObjectId,
     ref: Category.name,
-    required: true
+    required: false
   })
   category!: Types.ObjectId;
 
