@@ -65,6 +65,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       payload: buildRequestPayload(request),
       type: extractErrorType(exception)
     };
+    console.error(errorLogPayload)
 
     try {
       await this.errorLoggerService.addErrorLog(errorLogPayload);

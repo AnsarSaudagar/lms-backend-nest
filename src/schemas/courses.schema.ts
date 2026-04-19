@@ -21,7 +21,7 @@ export class Course {
     trim: true,
     index: true,
   })
-  title: string;
+  title!: string;
 
   @Prop({
     trim: true,
@@ -33,13 +33,13 @@ export class Course {
     default: COURSE_STATUS.DRAFT,
     index: true,
   })
-  status: CourseStatus;
+  status!: CourseStatus;
 
   @Prop({
     type: [TopicSchema],
     default: [],
   })
-  topics: Topic[];
+  topics!: Topic[];
 
   @Prop({
     type: Number,
@@ -47,7 +47,7 @@ export class Course {
     min: 0,
     default: 0
   })
-  price: number;
+  price!: number;
 
   @Prop({
     type: String,
@@ -55,19 +55,19 @@ export class Course {
     enum: Object.keys(DIFFICULTY_LEVEL),
     default: 'BEGINNER',
   })
-  difficultyLevel: string;
+  difficultyLevel!: string;
 
   @Prop({
     type: Types.ObjectId,
     ref: Category.name,
     required: true
   })
-  category: Types.ObjectId;
+  category!: Types.ObjectId;
 
   @Prop({
     default: null
   })
-  imageUrl : string;
+  imageUrl!: string;
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);

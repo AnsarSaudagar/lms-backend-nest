@@ -14,7 +14,7 @@ export class Category {
         trim: true,
         index: true,
     })
-    name: string;
+    name!: string;
 
     @Prop({
         required: true,
@@ -22,7 +22,7 @@ export class Category {
         trim: true,
         index: true,
     })
-    slug: string;
+    slug!: string;
 
     @Prop({
         trim: true,
@@ -32,15 +32,15 @@ export class Category {
     @Prop({
         default: true,
     })
-    isActive : boolean
+    isActive!: boolean;
 
     @Prop({
         type: Number
     })
-    coursesCount: number;
+    coursesCount!: number;
 
     @Prop()
-    icon: string;
+    icon!: string;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

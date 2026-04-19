@@ -21,30 +21,30 @@ export class ErrorLogger extends Document {
     type: Types.ObjectId,
     ref: User.name,
   })
-  user_id: Types.ObjectId;
+  user_id!: Types.ObjectId;
 
   @Prop({
     // required: true,
   })
-  url: string;
+  url!: string;
 
   @Prop()
-  type: string;
+  type!: string;
 
   @Prop()
-  browser: string;
+  browser!: string;
 
   @Prop()
-  stack: string;
+  stack!: string;
 
   @Prop()
-  method: string;
+  method!: string;
 
   @Prop()
-  host: string;
+  host!: string;
 
   @Prop()
-  ip : string;
+  ip!: string;
 
   @Prop({
     type: MongooseSchema.Types.Mixed
@@ -54,7 +54,7 @@ export class ErrorLogger extends Document {
   @Prop({
     default: 'danger'
   })
-  severity: string;
+  severity!: string;
 }
 
 export const ErrorLoggerSchema = SchemaFactory.createForClass(ErrorLogger);

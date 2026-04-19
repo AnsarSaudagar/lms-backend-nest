@@ -17,7 +17,7 @@ export class User extends Document {
     trim: true,
     index: true,
   })
-  email: string;
+  email!: string;
 
   @Prop({
     required: true,
@@ -25,14 +25,14 @@ export class User extends Document {
     minlength: 2,
     maxlength: 50,
   })
-  firstName: string;
+  firstName!: string;
   @Prop({
     required: false,
     trim: true,
     minlength: 2,
     maxlength: 50,
   })
-  middleName: string;
+  middleName!: string;
 
   @Prop({
     required: true,
@@ -40,29 +40,29 @@ export class User extends Document {
     minlength: 2,
     maxlength: 50,
   })
-  lastName: string;
+  lastName!: string;
 
   @Prop({
     required: true,
     // select: false,
   })
-  password: string;
+  password!: string;
 
   @Prop()
-  mobileNumber: number;
+  mobileNumber!: number;
 
   @Prop({
     index: true,
     enum: Object.keys(USER_TYPE),
     default: LEARNER_KEY,
   })
-  role: string;
+  role!: string;
 
   @Prop({
     default: true,
     index: true,
   })
-  isActive: boolean;
+  isActive!: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

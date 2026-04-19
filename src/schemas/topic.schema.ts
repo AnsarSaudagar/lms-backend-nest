@@ -7,7 +7,7 @@ import { TOPIC_STATUS, type TopicStatus } from 'src/common/constants/topic-statu
 })
 export class Topic {
   @Prop({ required: true, trim: true })
-  title: string;
+  title!: string;
 
   @Prop({ type: String, default: null })
   image?: string | null;
@@ -16,26 +16,26 @@ export class Topic {
   description?: string;
 
   @Prop({ type: String, default: null })
-  shortDescription: string;
+  shortDescription!: string;
 
   @Prop({
     type: Number,
     required: true,
     min: 0,
   })
-  duration: number; // in seconds
+  duration!: number; // in seconds
 
   @Prop({
     default: []
   })
-  videos: string[];
+  videos!: string[];
 
   @Prop({
     enum: Object.values(TOPIC_STATUS),
     default: TOPIC_STATUS.ACTIVE,
     index: true,
   })
-  status: TopicStatus;
+  status!: TopicStatus;
 }
 
 export const TopicSchema = SchemaFactory.createForClass(Topic);
