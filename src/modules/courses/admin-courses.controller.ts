@@ -16,21 +16,31 @@ import { Course } from 'src/schemas/courses.schema';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryStorageConfig } from 'src/config/cloudinary-storage';
+import { CourseGeneratorService } from './course-generator.service';
 
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 @Controller('admin/courses')
 export class AdminCoursesController {
-  constructor(private readonly coursesService: CoursesService) {}
+  constructor(private readonly coursesService: CoursesService, private readonly generatorService: CourseGeneratorService) {}
 
   @Post()
   createCourse(@Body() createCourseDto: NewCourseDto) {
     return this.coursesService.create(createCourseDto);
   }
 
+  @Get("test")
+  async testCourse(){
+    console.log("in test controller");
+    
+    return await this.generatorService.generateCourse("What is angular");
+  }
+
   @Get()
   findAllCourses() {
     return this.coursesService.findAll();
   }
+
+  
 
   @Get(':id')
   findCourseById(@Param('id') id: string) {
