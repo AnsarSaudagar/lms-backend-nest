@@ -1,6 +1,7 @@
 import * as argon2 from 'argon2';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -19,18 +20,14 @@ export class AuthService {
   async register(data: UserRegisterDTO) {
     const { email, password, firstName, middleName, lastName } = data;
 
-    const existingUser: User | null =
-      await this.usersService.findByEmail(email);
+    const existingUser: User | null = await this.usersService.findByEmail(email);
 
-    // Checking if user already exist
     if (existingUser) {
-      throw new BadRequestException('Email is already used');
+      throw new BadRequestException('An account with this email already exists');
     }
 
-    // Hashing password for security
     const hashedPassword = await this.hashPassword(password);
 
-    // Creating new user
     const user = await this.usersService.createUser({
       email,
       password: hashedPassword,
@@ -39,47 +36,49 @@ export class AuthService {
       middleName,
     });
 
-    // Removing password
     const { password: _, ...safeUser } = user.toObject();
-
     return safeUser;
   }
 
-  async login(email: string, password: string, userRole: String ) {
+  async login(email: string, password: string, expectedRole: string) {
     const user: User | null = await this.usersService.findByEmail(email);
-    console.log(user);
-    
+
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid email or password');
     }
 
-    if(user.role !== userRole){
-      throw new UnauthorizedException();
+    if (user.role !== expectedRole) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    if (!user.isActive) {
+      throw new ForbiddenException('Your account has been deactivated. Please contact support.');
     }
 
     const valid = await this.verifyPassword(user.password, password);
 
-    if (!valid) throw new UnauthorizedException();
+    if (!valid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
 
-    return this.issuesToken(user);
+    return this.issueToken(user);
   }
 
   private async hashPassword(password: string): Promise<string> {
-    const hash: string = await argon2.hash(password);
-    return hash;
+    return argon2.hash(password);
   }
 
   private async verifyPassword(hash: string, password: string): Promise<boolean> {
-    const isValid: boolean = await argon2.verify(hash, password);
-    return isValid;
+    return argon2.verify(hash, password);
   }
 
-  private async issuesToken(user: User) {
+  private async issueToken(user: User) {
     const payload = {
       sub: user._id,
+      role: user.role,
     };
-    const accessToken = await this.jwtService.signAsync(payload);
 
+    const accessToken = await this.jwtService.signAsync(payload);
     return { accessToken };
   }
 }
