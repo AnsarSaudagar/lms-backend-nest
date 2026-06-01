@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsArray, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
-import { TOPIC_STATUS, TopicStatus } from 'src/common/constants/topic-status.constant';
+import * as topicStatusConstant from 'src/common/constants/topic-status.constant';
 
 export class CreateNewTopicDto {
   @ApiProperty({ example: 'Getting Started with Components' })
@@ -33,7 +33,7 @@ export class CreateNewTopicDto {
   @IsOptional()
   videos?: [];
 
-  @ApiProperty({ enum: Object.values(TOPIC_STATUS), example: TOPIC_STATUS.DRAFT })
-  @IsIn(Object.values(TOPIC_STATUS))
-  status!: TopicStatus;
+  @ApiProperty({ enum: Object.values(topicStatusConstant.TOPIC_STATUS), example: topicStatusConstant.TOPIC_STATUS.DRAFT })
+  @IsIn(Object.values(topicStatusConstant.TOPIC_STATUS))
+  status!: topicStatusConstant.TopicStatus;
 }
