@@ -26,10 +26,10 @@ export class User extends Document {
     maxlength: 50,
   })
   firstName!: string;
+  
   @Prop({
     required: false,
     trim: true,
-    minlength: 2,
     maxlength: 50,
   })
   middleName!: string;
