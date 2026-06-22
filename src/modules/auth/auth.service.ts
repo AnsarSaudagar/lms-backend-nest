@@ -9,12 +9,15 @@ import { UsersService } from '../users/users.service';
 import { User } from 'src/schemas/user.schema';
 import { JwtService } from '@nestjs/jwt';
 import { UserRegisterDTO } from './dtos/userRegister.dto';
+import { CacheService } from '../infrastructure/cache/cache.service';
+import { randomInt } from 'crypto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private cacheService: CacheService
   ) {}
 
   async register(data: UserRegisterDTO) {
@@ -35,9 +38,14 @@ export class AuthService {
       lastName,
       middleName,
     });
-
+    
     const { password: _, ...safeUser } = user.toObject();
-    return safeUser;
+    const otp = await this.createOtpForUser(email);
+    
+    return {
+      ...safeUser,
+      otp,
+    };
   }
 
   async login(email: string, password: string, expectedRole: string) {
@@ -64,6 +72,23 @@ export class AuthService {
     return this.issueToken(user);
   }
 
+  async verifyOtp(email: string, submittedOtp: string){
+    const storedOtp = await this.cacheService.get(`otp:${email}`);
+    console.log(storedOtp);
+    
+    if(!storedOtp){
+      throw new BadRequestException('Otp Expired')
+    }
+
+    if(storedOtp !== submittedOtp){
+      throw new BadRequestException('Invalid Otp');
+    }
+
+    await this.cacheService.delete(`otp:${email}`);
+
+    return true;
+  }
+
   private async hashPassword(password: string): Promise<string> {
     return argon2.hash(password);
   }
@@ -80,5 +105,20 @@ export class AuthService {
 
     const accessToken = await this.jwtService.signAsync(payload);
     return { accessToken };
+  }
+
+  private async createOtpForUser(email: string): Promise<string> {
+    const otp = randomInt(100000, 1000000).toString(); // 100000 - 999999
+    
+    await this.cacheService.set(
+      `otp:${email}`,
+      otp,
+      300_000, // 5 minutes TTL (in milliseconds)
+    );
+
+    console.log(await this.cacheService.get(`otp:${email}`));
+    
+
+    return otp;
   }
 }

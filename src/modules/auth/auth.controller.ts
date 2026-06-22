@@ -1,9 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { UserRegisterDTO } from './dtos/userRegister.dto';
 import { UserLoginDto } from './dtos/userLogin.dto';
 import { ADMIN_KEY, LEARNER_KEY } from 'src/common/constants/user-type.constant';
+import { VerifyOtpDto } from './dtos/verifyOtp.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -34,5 +35,13 @@ export class AuthController {
   @ApiResponse({ status: 403, description: 'Account is deactivated.' })
   loginAdmin(@Body() dto: UserLoginDto) {
     return this.authService.login(dto.email, dto.password, ADMIN_KEY);
+  }
+
+  @Post('/verify-otp')
+  @ApiOperation({ summary: 'Verify email OTP' })
+  @ApiResponse({ status: 200, description: 'OTP verified successfully.' })
+  @ApiResponse({ status: 400, description: 'OTP expired or invalid.' })
+  verifyOtp(@Body() dto: VerifyOtpDto){
+    return this.authService.verifyOtp(dto.email, dto.otp);
   }
 }

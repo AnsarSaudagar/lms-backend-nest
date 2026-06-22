@@ -26,7 +26,7 @@ export class UserRegisterDTO {
   @MaxLength(50)
   firstName!: string;
 
-  @ApiPropertyOptional({ example: 'Paul', minLength: 2, maxLength: 50 })
+  @ApiPropertyOptional({ example: 'Paul', maxLength: 50 })
   @IsString()
   @IsOptional()
   @MinLength(2)
