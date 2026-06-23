@@ -74,7 +74,6 @@ export class AuthService {
 
   async verifyOtp(email: string, submittedOtp: string){
     const storedOtp = await this.cacheService.get(`otp:${email}`);
-    console.log(storedOtp);
     
     if(!storedOtp){
       throw new BadRequestException('Otp Expired')
@@ -114,10 +113,7 @@ export class AuthService {
       `otp:${email}`,
       otp,
       300_000, // 5 minutes TTL (in milliseconds)
-    );
-
-    console.log(await this.cacheService.get(`otp:${email}`));
-    
+    );    
 
     return otp;
   }
