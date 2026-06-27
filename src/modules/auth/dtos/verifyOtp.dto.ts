@@ -10,4 +10,8 @@ export class VerifyOtpDto {
   @IsString()
   @Length(6, 6)
   otp!: string;
+
+  @ApiProperty({ example: 'reset-otp', description: 'Key for handling cache' })
+  @IsString()
+  key!:string;
 }

@@ -96,19 +96,9 @@ export class AuthService {
 
   async resetPassword(
     email: string,
-    submittedOtp: string,
     newPassword: string,
   ): Promise<{ message: string }> {
-    const storedOtp = await this.cacheService.get(`reset-otp:${email}`);
-
-    if (!storedOtp) {
-      throw new BadRequestException('OTP expired');
-    }
-
-    if (storedOtp !== submittedOtp) {
-      throw new BadRequestException('Invalid OTP');
-    }
-
+    
     const hashedPassword = await this.hashPassword(newPassword);
     await this.usersService.updatePassword(email, hashedPassword);
     await this.cacheService.delete(`reset-otp:${email}`);
@@ -116,8 +106,8 @@ export class AuthService {
     return { message: 'Password reset successfully' };
   }
 
-  async verifyOtp(email: string, submittedOtp: string) {
-    const storedOtp = await this.cacheService.get(`otp:${email}`);
+  async verifyOtp(email: string, submittedOtp: string, key: string) {
+    const storedOtp = await this.cacheService.get(`${key}:${email}`);
 
     if (!storedOtp) {
       throw new BadRequestException('Otp Expired');
@@ -134,7 +124,7 @@ export class AuthService {
       },
     });
 
-    await this.cacheService.delete(`otp:${email}`);
+    await this.cacheService.delete(`${key}:${email}`);
 
     return true;
   }

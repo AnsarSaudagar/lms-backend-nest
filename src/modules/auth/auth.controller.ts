@@ -44,7 +44,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'OTP verified successfully.' })
   @ApiResponse({ status: 400, description: 'OTP expired or invalid.' })
   verifyOtp(@Body() dto: VerifyOtpDto){
-    return this.authService.verifyOtp(dto.email, dto.otp);
+    return this.authService.verifyOtp(dto.email, dto.otp, dto.key);
   }
 
   @Post('/forgot-password')
@@ -60,6 +60,6 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'Password reset successfully.' })
   @ApiResponse({ status: 400, description: 'OTP expired or invalid.' })
   resetPassword(@Body() dto: ResetPasswordDto) {
-    return this.authService.resetPassword(dto.email, dto.otp, dto.newPassword);
+    return this.authService.resetPassword(dto.email, dto.newPassword);
   }
 }
