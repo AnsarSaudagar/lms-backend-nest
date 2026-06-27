@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,
@@ -27,9 +28,9 @@ export class UserRegisterDTO {
   firstName!: string;
 
   @ApiPropertyOptional({ example: 'Paul', maxLength: 50 })
+  // @Transform(({ value }) => value === '' ? undefined : value)
   @IsString()
   @IsOptional()
-  @MinLength(2)
   @MaxLength(50)
   middleName?: string;
 

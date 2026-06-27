@@ -11,13 +11,15 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRegisterDTO } from './dtos/userRegister.dto';
 import { CacheService } from '../infrastructure/cache/cache.service';
 import { randomInt } from 'crypto';
+import { MailService } from '../infrastructure/mailer/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    private cacheService: CacheService
+    private cacheService: CacheService,
+    private mailService: MailService
   ) {}
 
   async register(data: UserRegisterDTO) {
@@ -41,7 +43,8 @@ export class AuthService {
     
     const { password: _, ...safeUser } = user.toObject();
     const otp = await this.createOtpForUser(email);
-    console.log(otp);
+    
+    await this.mailService.sendOtp(email, otp);
     
     return {
       ...safeUser,
