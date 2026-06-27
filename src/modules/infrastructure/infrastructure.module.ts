@@ -2,6 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { ErrorLoggerModule } from './error-logger/error-logger.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { CacheService } from './cache/cache.service';
+import { MailService } from './mailer/mail.service';
 import KeyvRedis from '@keyv/redis';
 
 @Global()
@@ -16,7 +17,7 @@ import KeyvRedis from '@keyv/redis';
       }),
     })
   ],
-  exports: [ErrorLoggerModule, CacheService],
-  providers: [CacheService],
+  exports: [ErrorLoggerModule, CacheService, MailService],
+  providers: [CacheService, MailService],
 })
 export class InfrastructureModule {}
