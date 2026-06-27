@@ -63,6 +63,12 @@ export class User extends Document {
     index: true,
   })
   isActive!: boolean;
+
+  @Prop({
+    default: false,
+    index: true
+  })
+  isVerified!: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

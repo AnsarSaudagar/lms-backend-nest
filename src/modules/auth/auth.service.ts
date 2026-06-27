@@ -41,10 +41,10 @@ export class AuthService {
     
     const { password: _, ...safeUser } = user.toObject();
     const otp = await this.createOtpForUser(email);
+    console.log(otp);
     
     return {
       ...safeUser,
-      otp,
     };
   }
 
@@ -82,6 +82,13 @@ export class AuthService {
     if(storedOtp !== submittedOtp){
       throw new BadRequestException('Invalid Otp');
     }
+
+    const user = await this.usersService.findByEmail(email);
+    await user?.updateOne({
+      $set: {
+        isVerified: true,
+      }
+    });
 
     await this.cacheService.delete(`otp:${email}`);
 
