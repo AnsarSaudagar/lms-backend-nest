@@ -19,16 +19,19 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private cacheService: CacheService,
-    private mailService: MailService
+    private mailService: MailService,
   ) {}
 
   async register(data: UserRegisterDTO) {
     const { email, password, firstName, middleName, lastName } = data;
 
-    const existingUser: User | null = await this.usersService.findByEmail(email);
+    const existingUser: User | null =
+      await this.usersService.findByEmail(email);
 
     if (existingUser) {
-      throw new BadRequestException('An account with this email already exists');
+      throw new BadRequestException(
+        'An account with this email already exists',
+      );
     }
 
     const hashedPassword = await this.hashPassword(password);
@@ -40,12 +43,12 @@ export class AuthService {
       lastName,
       middleName,
     });
-    
+
     const { password: _, ...safeUser } = user.toObject();
-    const otp = await this.createOtpForUser(email);
-    
+    const otp = await this.createOtpForUser('otp', email);
+
     await this.mailService.sendOtp(email, otp);
-    
+
     return {
       ...safeUser,
     };
@@ -63,7 +66,9 @@ export class AuthService {
     }
 
     if (!user.isActive) {
-      throw new ForbiddenException('Your account has been deactivated. Please contact support.');
+      throw new ForbiddenException(
+        'Your account has been deactivated. Please contact support.',
+      );
     }
 
     const valid = await this.verifyPassword(user.password, password);
@@ -75,14 +80,50 @@ export class AuthService {
     return this.issueToken(user);
   }
 
-  async verifyOtp(email: string, submittedOtp: string){
-    const storedOtp = await this.cacheService.get(`otp:${email}`);
-    
-    if(!storedOtp){
-      throw new BadRequestException('Otp Expired')
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const user = await this.usersService.findByEmail(email);
+
+    if (!user) {
+      return { message: 'OTP has been to the given email address' };
     }
 
-    if(storedOtp !== submittedOtp){
+    const otp = await this.createOtpForUser('reset-otp', email);
+
+    await this.mailService.sendOtp(email, otp);
+
+    return { message: 'If that email is registered, an OTP has been sent.' };
+  }
+
+  async resetPassword(
+    email: string,
+    submittedOtp: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
+    const storedOtp = await this.cacheService.get(`reset-otp:${email}`);
+
+    if (!storedOtp) {
+      throw new BadRequestException('OTP expired');
+    }
+
+    if (storedOtp !== submittedOtp) {
+      throw new BadRequestException('Invalid OTP');
+    }
+
+    const hashedPassword = await this.hashPassword(newPassword);
+    await this.usersService.updatePassword(email, hashedPassword);
+    await this.cacheService.delete(`reset-otp:${email}`);
+
+    return { message: 'Password reset successfully' };
+  }
+
+  async verifyOtp(email: string, submittedOtp: string) {
+    const storedOtp = await this.cacheService.get(`otp:${email}`);
+
+    if (!storedOtp) {
+      throw new BadRequestException('Otp Expired');
+    }
+
+    if (storedOtp !== submittedOtp) {
       throw new BadRequestException('Invalid Otp');
     }
 
@@ -90,7 +131,7 @@ export class AuthService {
     await user?.updateOne({
       $set: {
         isVerified: true,
-      }
+      },
     });
 
     await this.cacheService.delete(`otp:${email}`);
@@ -102,7 +143,10 @@ export class AuthService {
     return argon2.hash(password);
   }
 
-  private async verifyPassword(hash: string, password: string): Promise<boolean> {
+  private async verifyPassword(
+    hash: string,
+    password: string,
+  ): Promise<boolean> {
     return argon2.verify(hash, password);
   }
 
@@ -116,14 +160,14 @@ export class AuthService {
     return { accessToken };
   }
 
-  private async createOtpForUser(email: string): Promise<string> {
+  private async createOtpForUser(key:string, email: string): Promise<string> {
     const otp = randomInt(100000, 1000000).toString(); // 100000 - 999999
-    
+
     await this.cacheService.set(
-      `otp:${email}`,
+      `${key}:${email}`,
       otp,
       300_000, // 5 minutes TTL (in milliseconds)
-    );    
+    );
 
     return otp;
   }

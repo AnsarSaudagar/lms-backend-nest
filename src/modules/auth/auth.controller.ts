@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { UserRegisterDTO } from './dtos/userRegister.dto';
 import { UserLoginDto } from './dtos/userLogin.dto';
 import { ADMIN_KEY, LEARNER_KEY } from 'src/common/constants/user-type.constant';
 import { VerifyOtpDto } from './dtos/verifyOtp.dto';
+import { ForgotPasswordDto } from './dtos/forgotPassword.dto';
+import { ResetPasswordDto } from './dtos/resetPassword.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -43,5 +45,21 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'OTP expired or invalid.' })
   verifyOtp(@Body() dto: VerifyOtpDto){
     return this.authService.verifyOtp(dto.email, dto.otp);
+  }
+
+  @Post('/forgot-password')
+  @ApiOperation({ summary: 'Request a password reset OTP' })
+  @ApiResponse({ status: 201, description: 'OTP sent if the email is registered.' })
+  @ApiResponse({ status: 400, description: 'Validation failed.' })
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto.email);
+  }
+
+  @Post('/reset-password')
+  @ApiOperation({ summary: 'Reset password using OTP' })
+  @ApiResponse({ status: 201, description: 'Password reset successfully.' })
+  @ApiResponse({ status: 400, description: 'OTP expired or invalid.' })
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto.email, dto.otp, dto.newPassword);
   }
 }

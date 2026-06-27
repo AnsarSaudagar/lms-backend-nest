@@ -18,4 +18,8 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     return this.userModel.findOne({ email }).exec();
   }
+
+  async updatePassword(email: string, hashedPassword: string): Promise<void> {
+    await this.userModel.updateOne({ email }, { $set: { password: hashedPassword } }).exec();
+  }
 }
