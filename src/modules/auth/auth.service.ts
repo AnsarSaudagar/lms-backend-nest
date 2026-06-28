@@ -77,7 +77,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    return this.issueToken(user);
+    const { password: _, ...safeUser } = user.toObject();
+    return { ...await this.issueToken(user), ...safeUser };
   }
 
   async forgotPassword(email: string): Promise<{ message: string }> {
