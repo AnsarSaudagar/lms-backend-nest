@@ -95,6 +95,12 @@ export class Project {
   @Prop({ type: Object, default: {} })
   dependencies!: Record<string, unknown>;
 
+  @Prop({ type: Boolean, default: false, index: true })
+  isPaid!: boolean;
+
+  @Prop({ type: Number, min: 0, default: 0 })
+  price!: number;
+
   @Prop({ type: [ProjectStepSchema], default: [] })
   steps!: ProjectStep[];
 }
