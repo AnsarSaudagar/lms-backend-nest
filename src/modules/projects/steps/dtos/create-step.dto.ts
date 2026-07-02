@@ -10,6 +10,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import { CODE_BLOCK_ACTION } from 'src/common/constants/project.constant';
 
 export class CodeBlockDto {
   @ApiProperty({ example: 'src/app/app.component.ts' })
@@ -22,8 +23,8 @@ export class CodeBlockDto {
   @IsNotEmpty()
   language!: string;
 
-  @ApiProperty({ enum: ['create', 'modify', 'delete'], example: 'create' })
-  @IsIn(['create', 'modify', 'delete'])
+  @ApiProperty({ enum: [...CODE_BLOCK_ACTION], example: 'create' })
+  @IsIn(CODE_BLOCK_ACTION)
   action!: string;
 
   @ApiProperty({ example: 'export class AppComponent {}' })

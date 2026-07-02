@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Course } from 'src/schemas/courses.schema';
-import { CreateNewTopicDto } from './dtos/createNewTopic.dto';
+import { Course } from 'src/modules/courses/schemas/course.schema';
+import { CreateNewTopicDto } from './dtos/create-new-topic.dto';
 
 @Injectable()
 export class TopicsService {

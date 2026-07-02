@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';;
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Category, CategoryDocument } from 'src/schemas/categories.schema';
+import { CreateCategoryDto } from './dtos/create-category.dto';
+import { UpdateCategoryDto } from './dtos/update-category.dto';
+import { Category, CategoryDocument } from 'src/modules/categories/schemas/category.schema';
 import { slugify } from 'src/common/utils/slugify.util';
 
 @Injectable()

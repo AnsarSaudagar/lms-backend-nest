@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Project } from 'src/schemas/project.schema';
+import { Project } from 'src/modules/projects/schemas/project.schema';
 import { CreateStepDto } from './dtos/create-step.dto';
 
 @Injectable()

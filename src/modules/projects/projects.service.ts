@@ -1,16 +1,16 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Project } from 'src/schemas/project.schema';
-import { CreateProjectDto } from './dto/create-project.dto';
-import { UpdateProjectDto } from './dto/update-project.dto';
-import { ImportProjectDto } from './dto/import-project.dto';
+import { Project, ProjectDocument } from 'src/modules/projects/schemas/project.schema';
+import { CreateProjectDto } from './dtos/create-project.dto';
+import { UpdateProjectDto } from './dtos/update-project.dto';
+import { ImportProjectDto } from './dtos/import-project.dto';
 
 @Injectable()
 export class ProjectsService {
   constructor(
     @InjectModel(Project.name)
-    private readonly projectModel: Model<Project>,
+    private readonly projectModel: Model<ProjectDocument>,
   ) {}
 
   create(dto: CreateProjectDto) {

@@ -6,12 +6,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { User } from 'src/schemas/user.schema';
+import { User } from 'src/modules/users/schemas/user.schema';
 import { JwtService } from '@nestjs/jwt';
-import { UserRegisterDTO } from './dtos/userRegister.dto';
-import { CacheService } from '../infrastructure/cache/cache.service';
+import { UserRegisterDTO } from './dtos/user-register.dto';
+import { CacheService } from 'src/infrastructure/cache/cache.service';
 import { randomInt } from 'crypto';
-import { MailService } from '../infrastructure/mailer/mail.service';
+import { MailService } from 'src/infrastructure/mailer/mail.service';
 
 @Injectable()
 export class AuthService {

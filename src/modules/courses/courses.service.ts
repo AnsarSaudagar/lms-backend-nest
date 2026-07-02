@@ -5,12 +5,13 @@ import {
   COURSE_STATUS,
   CourseStatus,
 } from 'src/common/constants/course-status.constant';
-import { Course, CourseDocument } from 'src/schemas/courses.schema';
-import { FindProductFilter } from './dtos/find-product-filter';
+import { Course, CourseDocument } from 'src/modules/courses/schemas/course.schema';
+import { FindProductFilter } from './dtos/find-product-filter.dto';
 import { CategoryService } from '../categories/categories.service';
-import { Category } from 'src/schemas/categories.schema';
+import { Category } from 'src/modules/categories/schemas/category.schema';
 import { DIFFICULTY_LEVEL } from 'src/common/constants/difficulty-level.constant';
 import { CourseDetailsDto } from './dtos/course-details.dto';
+import { UpdateCourseDto } from './dtos/update-course.dto';
 
 @Injectable()
 export class CoursesService {
@@ -80,7 +81,7 @@ export class CoursesService {
   }
 
 
-  async update(courseId: string, data: Partial<Course>) {
+  async update(courseId: string, data: UpdateCourseDto) {
 
     if (!isValidObjectId(courseId)) {
       throw new BadRequestException('Invalid MongoDB ObjectId');

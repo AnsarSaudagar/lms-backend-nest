@@ -7,7 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { randomBytes } from 'crypto';
-import { Payment, PaymentDocument } from 'src/schemas/payment.schema';
+import { Payment, PaymentDocument } from 'src/modules/purchases/schemas/payment.schema';
 import { PAYMENT_STATUS } from 'src/common/constants/payment-status.constant';
 import { ACCESS_TYPE } from 'src/common/constants/access-type.constant';
 import { UserProjectService } from './user-project.service';

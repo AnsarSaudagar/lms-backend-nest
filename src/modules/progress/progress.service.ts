@@ -8,8 +8,8 @@ import { Model } from 'mongoose';
 import {
   UserProjectProgress,
   UserProjectProgressDocument,
-} from 'src/schemas/user-project-progress.schema';
-import { ProjectDocument } from 'src/schemas/project.schema';
+} from 'src/modules/progress/schemas/user-project-progress.schema';
+import { ProjectDocument } from 'src/modules/projects/schemas/project.schema';
 import { UserProjectService } from '../purchases/user-project.service';
 
 @Injectable()

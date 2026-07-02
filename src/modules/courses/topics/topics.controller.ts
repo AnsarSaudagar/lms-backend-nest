@@ -1,10 +1,16 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TopicsService } from './topics.service';
-import { CreateNewTopicDto } from './dtos/createNewTopic.dto';
+import { CreateNewTopicDto } from './dtos/create-new-topic.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { ADMIN_KEY } from 'src/common/constants/user-type.constant';
 
 @ApiTags('Admin / Topics')
 @ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(ADMIN_KEY)
 @Controller('/courses/:id/topics')
 export class TopicsController {
   constructor(private readonly topicService: TopicsService) {}

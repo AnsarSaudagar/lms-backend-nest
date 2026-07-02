@@ -2,22 +2,23 @@ import { Module } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CoursesController } from './courses.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Course, CourseSchema } from 'src/schemas/courses.schema';
+import { Course, CourseSchema } from 'src/modules/courses/schemas/course.schema';
 import { TopicsController } from './topics/topics.controller';
 import { TopicsService } from './topics/topics.service';
-import { CategoryService } from '../categories/categories.service';
-import { Category } from 'src/schemas/categories.schema';
 import { AdminCoursesController } from './admin-courses.controller';
 import { CourseGeneratorService } from './course-generator.service';
+import { CategoriesModule } from '../categories/categories.module';
+import { StorageModule } from 'src/infrastructure/storage/storage.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      {name: Course.name, schema: CourseSchema},
-      {name: Category.name, schema: CourseSchema},
-    ])
+      { name: Course.name, schema: CourseSchema },
+    ]),
+    CategoriesModule,
+    StorageModule,
   ],
   controllers: [CoursesController, TopicsController, AdminCoursesController],
-  providers: [CoursesService, TopicsService, CategoryService, CourseGeneratorService],
+  providers: [CoursesService, TopicsService, CourseGeneratorService],
 })
 export class CoursesModule {}

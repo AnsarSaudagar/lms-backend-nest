@@ -3,13 +3,16 @@ import { Injectable } from '@nestjs/common';
 import { Ollama } from 'ollama';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Course, CourseDocument } from 'src/modules/courses/schemas/course.schema';
 
 @Injectable()
 export class CourseGeneratorService {
   private ollama = new Ollama({ host: 'http://localhost:11434' });
   private MODEL = 'qwen2.5:7b';
 
-  constructor(@InjectModel('Course') private courseModel: Model<any>) {}
+  constructor(
+    @InjectModel(Course.name) private courseModel: Model<CourseDocument>,
+  ) {}
 
   async generateCourse(topic: string) {
     // Phase 1: Generate structure

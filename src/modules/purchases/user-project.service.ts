@@ -9,32 +9,22 @@ import { Model, Types } from 'mongoose';
 import {
   UserProject,
   UserProjectDocument,
-} from 'src/schemas/user-project.schema';
-import { Project, ProjectDocument } from 'src/schemas/project.schema';
+} from 'src/modules/purchases/schemas/user-project.schema';
+import { ProjectDocument } from 'src/modules/projects/schemas/project.schema';
 import { ACCESS_TYPE, type AccessType } from 'src/common/constants/access-type.constant';
+import { ProjectsService } from '../projects/projects.service';
 
 @Injectable()
 export class UserProjectService {
   constructor(
     @InjectModel(UserProject.name)
     private readonly userProjectModel: Model<UserProjectDocument>,
-    @InjectModel(Project.name)
-    private readonly projectModel: Model<ProjectDocument>,
+    private readonly projectsService: ProjectsService,
   ) {}
 
   /** Loads a project by id or throws 404. Reused by the payment flow. */
   async getProjectOrThrow(projectId: string): Promise<ProjectDocument> {
-    if (!Types.ObjectId.isValid(projectId)) {
-      throw new NotFoundException('Project not found');
-    }
-
-    const project = await this.projectModel.findById(projectId).exec();
-
-    if (!project) {
-      throw new NotFoundException('Project not found');
-    }
-
-    return project;
+    return this.projectsService.findOne(projectId);
   }
 
   /**

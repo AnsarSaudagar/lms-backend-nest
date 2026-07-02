@@ -8,7 +8,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { ErrorLoggerService } from 'src/modules/infrastructure/error-logger/error-logger.service';
+import { ErrorLoggerService } from 'src/infrastructure/error-logger/error-logger.service';
 import { Types } from 'mongoose';
 import { buildRequestPayload, extractBrowserShort, extractErrorType, sanitizeBody } from '../utils/error-handler.util';
 
@@ -65,7 +65,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
       payload: buildRequestPayload(request),
       type: extractErrorType(exception)
     };
-    console.error(errorLogPayload.message)
+    this.logger.error(
+      `${request.method} ${request.originalUrl} -> ${JSON.stringify({
+        message: errorMessage.message,
+        error: errorMessage.error,
+        statusCode: status,
+      })}`,
+    );
 
     try {
       await this.errorLoggerService.addErrorLog(errorLogPayload);

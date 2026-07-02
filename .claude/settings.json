@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+o /dev/null -w \"      "Bash(curl -s -root %{http_code}\\\\n\" http://localhost:7200/)",
+      "Bash(curl -s -o /dev/null -w \"swagger %{http_code}\\\\n\" http://localhost:7200/api/docs)",
+      "Bash(curl -s -w \"\\\\nadmin-no-token %{http_code}\\\\n\" http://localhost:7200/admin/courses)",
+      "Bash(curl -s -w \"\\\\nerrorlog-no-token %{http_code}\\\\n\" http://localhost:7200/error-logger)",
+      "Bash(curl -s -o /dev/null -w \"courses-public %{http_code}\\\\n\" http://localhost:7200/courses)",
+      "PowerShell($p = Get-Process -Id 68640; \"$\\($p.ProcessName\\) started $\\($p.StartTime\\)\"; \\(Get-CimInstance Win32_Process -Filter \"ProcessId=68640\"\\).CommandLine)",
+      "Bash(curl -s -w \" <- admin-no-token %{http_code}\\\\n\" http://localhost:7200/admin/courses)",
+      "Bash(curl -s -w \" <- errorlog-no-token %{http_code}\\\\n\" http://localhost:7200/error-logger)",
+      "Bash(npx jest *)"
+    ]
+  }
+}

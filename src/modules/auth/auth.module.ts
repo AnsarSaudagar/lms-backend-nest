@@ -6,10 +6,12 @@ import { JwtStrategy } from './jwt.strategy';
 import { UsersModule } from '../users/users.module';
 import { ConfigService } from '@nestjs/config';
 import { StringValue } from 'ms';
+import { MailerModule } from 'src/infrastructure/mailer/mailer.module';
 
 @Module({
   imports: [
     UsersModule,
+    MailerModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
