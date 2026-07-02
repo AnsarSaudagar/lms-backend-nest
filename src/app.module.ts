@@ -13,6 +13,8 @@ import { CoursesModule } from './modules/courses/courses.module';
 import { GeminiService } from './gemini/gemini.service';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { ProjectsModule } from './modules/projects/projects.module';
+import { PurchasesModule } from './modules/purchases/purchases.module';
+import { ProgressModule } from './modules/progress/progress.module';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { ProjectsModule } from './modules/projects/projects.module';
     CoursesModule,
     CategoriesModule,
     ProjectsModule,
+    PurchasesModule,
+    ProgressModule,
   ],
   controllers: [AppController],
   providers: [
