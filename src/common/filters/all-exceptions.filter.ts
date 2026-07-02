@@ -66,11 +66,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       type: extractErrorType(exception)
     };
     this.logger.error(
-      `${request.method} ${request.originalUrl} -> ${JSON.stringify({
-        message: errorMessage.message,
-        error: errorMessage.error,
-        statusCode: status,
-      })}`,
+      `${request.method} ${request.originalUrl} ${status} - ${errorMessage.error ?? 'Error'}: ${errorMessage.message}`,
     );
 
     try {
