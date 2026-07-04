@@ -18,10 +18,10 @@ export class ProjectsService {
   }
 
   findAll() {
-    return this.projectModel
-      .find()
-      .select('-steps')
-      .lean();
+    return this.projectModel.aggregate([
+      { $addFields: { stepCount: { $size: '$steps' } } },
+      { $project: { steps: 0 } },
+    ]);
   }
 
   async findOne(id: string) {
