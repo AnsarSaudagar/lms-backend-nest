@@ -4,6 +4,7 @@ import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dtos/create-project.dto';
 import { UpdateProjectDto } from './dtos/update-project.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 
 @UseGuards(JwtAuthGuard)
 @ApiTags('Projects')
@@ -23,8 +24,11 @@ export class ProjectsController {
   @ApiParam({ name: 'slug', example: 'todo-app-angular', description: 'URL-safe project slug' })
   @ApiResponse({ status: 200, description: 'Full project including steps.' })
   @ApiResponse({ status: 404, description: 'Project not found.' })
-  findBySlug(@Param('slug') slug: string) {
-    return this.projectsService.findBySlug(slug);
+  
+  findBySlug(
+    @CurrentUser('userId') userId: string,
+    @Param('slug') slug: string) {
+    return this.projectsService.findBySlugAndUserProjectStatus(slug, userId);
   }
 
 }

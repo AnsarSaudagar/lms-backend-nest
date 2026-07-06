@@ -5,12 +5,15 @@ import { Project, ProjectDocument } from 'src/modules/projects/schemas/project.s
 import { CreateProjectDto } from './dtos/create-project.dto';
 import { UpdateProjectDto } from './dtos/update-project.dto';
 import { ImportProjectDto } from './dtos/import-project.dto';
+import { UserProject, UserProjectDocument } from '../purchases/schemas/user-project.schema';
 
 @Injectable()
 export class ProjectsService {
   constructor(
     @InjectModel(Project.name)
     private readonly projectModel: Model<ProjectDocument>,
+    @InjectModel(UserProject.name)
+    private readonly userProjectModel: Model<UserProjectDocument>,
   ) {}
 
   create(dto: CreateProjectDto) {
@@ -37,13 +40,20 @@ export class ProjectsService {
     return project;
   }
 
-  async findBySlug(slug: string) {
+  async findBySlugAndUserProjectStatus(slug: string, userId: string) {
     const project = await this.projectModel.findOne({ slug });
     if (!project) {
       throw new NotFoundException('Project not found');
     }
+    const userProject = await this.userProjectModel.findOne({user: userId, project: project.id});
+    
+    const responseData : any = { ...project.toObject() };
 
-    return project;
+    responseData.isEnrolled = false;
+
+    if(userProject) responseData.isEnrolled = true;
+
+    return responseData;
   }
 
   async update(id: string, dto: UpdateProjectDto) {
