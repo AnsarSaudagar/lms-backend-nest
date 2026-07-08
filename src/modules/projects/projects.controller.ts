@@ -15,8 +15,8 @@ export class ProjectsController {
   @Get()
   @ApiOperation({ summary: 'List all projects (steps excluded)' })
   @ApiResponse({ status: 200, description: 'Array of project summaries.' })
-  findAll() {
-    return this.projectsService.findAll();
+  findAll(@CurrentUser('userId') userId: string) {
+    return this.projectsService.findAll(userId);
   }
 
   @Get(':slug')

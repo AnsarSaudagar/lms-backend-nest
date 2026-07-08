@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -17,6 +19,7 @@ export class ProgressService {
   constructor(
     @InjectModel(UserProjectProgress.name)
     private readonly progressModel: Model<UserProjectProgressDocument>,
+    @Inject(forwardRef(() => UserProjectService))
     private readonly userProjectService: UserProjectService,
   ) {}
 

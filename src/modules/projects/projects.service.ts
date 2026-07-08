@@ -20,9 +20,16 @@ export class ProjectsService {
     return this.projectModel.create(dto);
   }
 
-  findAll() {
+  async findAll(userId: string) {
+    const enrolled = await this.userProjectModel.distinct('project', { user: userId });
+
     return this.projectModel.aggregate([
-      { $addFields: { stepCount: { $size: '$steps' } } },
+      {
+        $addFields: {
+          stepCount: { $size: '$steps' },
+          isEnrolled: { $in: [{ $toString: '$_id' }, enrolled.map(String)] },
+        },
+      },
       { $project: { steps: 0 } },
     ]);
   }
@@ -45,15 +52,9 @@ export class ProjectsService {
     if (!project) {
       throw new NotFoundException('Project not found');
     }
-    const userProject = await this.userProjectModel.findOne({user: userId, project: project.id});
-    
-    const responseData : any = { ...project.toObject() };
+    const isEnrolled = await this.userProjectModel.exists({ user: userId, project: project.id });
 
-    responseData.isEnrolled = false;
-
-    if(userProject) responseData.isEnrolled = true;
-
-    return responseData;
+    return { ...project.toObject(), isEnrolled: !!isEnrolled };
   }
 
   async update(id: string, dto: UpdateProjectDto) {

@@ -9,17 +9,20 @@ import { PaymentsService } from './payments.service';
 import { UserProjectService } from './user-project.service';
 import { PurchasesController } from './purchases.controller';
 import { ProjectsModule } from '../projects/projects.module';
+import { ProgressService } from '../progress/progress.service';
+import { UserProjectProgress, UserProjectProgressSchema } from '../progress/schemas/user-project-progress.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Payment.name, schema: PaymentSchema },
       { name: UserProject.name, schema: UserProjectSchema },
+      { name: UserProjectProgress.name, schema: UserProjectProgressSchema}
     ]),
     ProjectsModule,
   ],
   controllers: [PurchasesController],
-  providers: [PaymentsService, UserProjectService],
+  providers: [PaymentsService, UserProjectService, ProgressService],
   exports: [UserProjectService],
 })
 export class PurchasesModule {}

@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,6 +15,7 @@ import {
 import { ProjectDocument } from 'src/modules/projects/schemas/project.schema';
 import { ACCESS_TYPE, type AccessType } from 'src/common/constants/access-type.constant';
 import { ProjectsService } from '../projects/projects.service';
+import { ProgressService } from '../progress/progress.service';
 
 @Injectable()
 export class UserProjectService {
@@ -20,6 +23,8 @@ export class UserProjectService {
     @InjectModel(UserProject.name)
     private readonly userProjectModel: Model<UserProjectDocument>,
     private readonly projectsService: ProjectsService,
+    @Inject(forwardRef(() => ProgressService))
+    private readonly progressService: ProgressService,
   ) {}
 
   /** Loads a project by id or throws 404. Reused by the payment flow. */
@@ -75,7 +80,10 @@ export class UserProjectService {
       throw new ConflictException('You are already enrolled in this project');
     }
 
-    return this.grant(userId, projectId, ACCESS_TYPE.FREE);
+    const userProject = await this.grant(userId, projectId, ACCESS_TYPE.FREE);
+    await this.progressService.getOrCreate(userId, projectId);
+
+    return userProject;
   }
 
   async hasAccess(userId: string, projectId: string): Promise<boolean> {
