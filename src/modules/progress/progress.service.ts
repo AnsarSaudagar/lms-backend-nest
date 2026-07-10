@@ -100,11 +100,11 @@ export class ProgressService {
   async findCompletedSteps(
     project: string,
     user: string,
-  ): Promise<UserProjectProgressDocument[]> {
-    return this.progressModel
-      .find({ user, project })
-      .populate('completedSteps')
+  ): Promise<number[]> {
+    const progress = await this.progressModel
+      .findOne({ user, project })
       .exec();
+    return progress?.completedSteps ?? [];
   }
 
   private async upsertRow(
