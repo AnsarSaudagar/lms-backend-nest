@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Project, ProjectDocument } from 'src/modules/projects/schemas/project.schema';
@@ -6,6 +6,7 @@ import { CreateProjectDto } from './dtos/create-project.dto';
 import { UpdateProjectDto } from './dtos/update-project.dto';
 import { ImportProjectDto } from './dtos/import-project.dto';
 import { UserProject, UserProjectDocument } from '../purchases/schemas/user-project.schema';
+import { ProgressService } from '../progress/progress.service';
 
 @Injectable()
 export class ProjectsService {
@@ -14,6 +15,8 @@ export class ProjectsService {
     private readonly projectModel: Model<ProjectDocument>,
     @InjectModel(UserProject.name)
     private readonly userProjectModel: Model<UserProjectDocument>,
+    @Inject(forwardRef(() => ProgressService))
+    private readonly progressService: ProgressService
   ) {}
 
   create(dto: CreateProjectDto) {
@@ -54,7 +57,9 @@ export class ProjectsService {
     }
     const isEnrolled = await this.userProjectModel.exists({ user: userId, project: project.id });
 
-    return { ...project.toObject(), isEnrolled: !!isEnrolled };
+    const completedSteps = await this.progressService.findCompletedSteps( project.id, userId);
+
+    return { ...project.toObject(), isEnrolled: !!isEnrolled, completedSteps };
   }
 
   async update(id: string, dto: UpdateProjectDto) {

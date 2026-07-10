@@ -22,6 +22,7 @@ export class UserProjectService {
   constructor(
     @InjectModel(UserProject.name)
     private readonly userProjectModel: Model<UserProjectDocument>,
+    @Inject(forwardRef(() => ProjectsService))
     private readonly projectsService: ProjectsService,
     @Inject(forwardRef(() => ProgressService))
     private readonly progressService: ProgressService,

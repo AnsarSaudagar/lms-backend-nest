@@ -77,7 +77,11 @@ export class ProgressService {
     progress.progressPercent =
       totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0;
 
-    if (totalSteps > 0 && completedCount >= totalSteps && !progress.isCompleted) {
+    if (
+      totalSteps > 0 &&
+      completedCount >= totalSteps &&
+      !progress.isCompleted
+    ) {
       progress.isCompleted = true;
       progress.completedAt = new Date();
     }
@@ -90,6 +94,16 @@ export class ProgressService {
     return this.progressModel
       .find({ user: userId })
       .populate('project', 'slug title')
+      .exec();
+  }
+
+  async findCompletedSteps(
+    project: string,
+    user: string,
+  ): Promise<UserProjectProgressDocument[]> {
+    return this.progressModel
+      .find({ user, project })
+      .populate('completedSteps')
       .exec();
   }
 
@@ -112,7 +126,10 @@ export class ProgressService {
   ): Promise<ProjectDocument> {
     const project = await this.userProjectService.getProjectOrThrow(projectId);
 
-    const hasAccess = await this.userProjectService.hasAccess(userId, projectId);
+    const hasAccess = await this.userProjectService.hasAccess(
+      userId,
+      projectId,
+    );
     if (!hasAccess) {
       throw new ForbiddenException('You do not have access to this project');
     }

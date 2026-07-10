@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Payment, PaymentSchema } from 'src/modules/purchases/schemas/payment.schema';
 import {
@@ -19,7 +19,7 @@ import { UserProjectProgress, UserProjectProgressSchema } from '../progress/sche
       { name: UserProject.name, schema: UserProjectSchema },
       { name: UserProjectProgress.name, schema: UserProjectProgressSchema}
     ]),
-    ProjectsModule,
+    forwardRef(() => ProjectsModule),
   ],
   controllers: [PurchasesController],
   providers: [PaymentsService, UserProjectService, ProgressService],
