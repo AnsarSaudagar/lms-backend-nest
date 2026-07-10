@@ -17,6 +17,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { PurchasesModule } from './modules/purchases/purchases.module';
 import { ProgressModule } from './modules/progress/progress.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ProgressModule } from './modules/progress/progress.module';
     ProjectsModule,
     PurchasesModule,
     ProgressModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [

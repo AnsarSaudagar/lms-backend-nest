@@ -17,5 +17,6 @@ import { PurchasesModule } from '../purchases/purchases.module';
   ],
   controllers: [ProgressController, MyProgressController],
   providers: [ProgressService],
+  exports: [ProgressService],
 })
 export class ProgressModule {}
