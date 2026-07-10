@@ -86,6 +86,13 @@ export class ProgressService {
     return progress;
   }
 
+  async getAllForUser(userId: string): Promise<UserProjectProgressDocument[]> {
+    return this.progressModel
+      .find({ user: userId })
+      .populate('project', 'slug title')
+      .exec();
+  }
+
   private async upsertRow(
     userId: string,
     projectId: string,
