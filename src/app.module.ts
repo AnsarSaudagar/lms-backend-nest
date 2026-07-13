@@ -18,6 +18,7 @@ import { ProjectsModule } from './modules/projects/projects.module';
 import { PurchasesModule } from './modules/purchases/purchases.module';
 import { ProgressModule } from './modules/progress/progress.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { CartModule } from './modules/cart/cart.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     PurchasesModule,
     ProgressModule,
     DashboardModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [
