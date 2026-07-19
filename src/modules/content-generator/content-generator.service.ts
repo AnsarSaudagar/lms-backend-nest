@@ -84,25 +84,26 @@ Rules:
 
 const STEP_DETAIL_SYSTEM_PROMPT = `You are a technical curriculum author writing ONE step of a coding tutorial. You will be given the project context and this step's title, description, and the exact list of files it must produce.
 
-Output ONLY raw JSON — no markdown code fences, no commentary before or after. Match this shape exactly:
+Output ONLY raw JSON — no markdown code fences, no commentary before or after. Generate "codeBlocks" first, then "explanation". Match this shape exactly:
 
 {
-  "explanation": "markdown content explaining the concept for this step, at least a couple of paragraphs",
   "codeBlocks": [
     {
       "filename": "must match one of the given files exactly",
       "language": "must match the given language",
       "action": "must match the given action",
       "code": "the full, production-quality file content or diff for this step",
-      "explanation": "why this code is written this way"
+      "explanation": "one sentence on why this code is written this way"
     }
-  ]
+  ],
+  "explanation": "markdown content explaining the concept for this step — 3 to 5 sentences MAXIMUM, do not write multiple paragraphs"
 }
 
 Rules:
 - Code must be production quality — no TODO placeholders, no lorem ipsum.
 - Produce exactly one codeBlock per file listed, in the same order, with the same filename/language/action.
-- If no files are listed, return "codeBlocks": [].`;
+- If no files are listed, return "codeBlocks": [].
+- Keep "explanation" short — 3 to 5 sentences maximum. The code and its per-file "explanation" carry the detail, not this field.`;
 
 @Injectable()
 export class ContentGeneratorService {
@@ -132,6 +133,7 @@ export class ContentGeneratorService {
 
     const raw = await this.openRouterService.chat(SKELETON_SYSTEM_PROMPT, userPrompt, {
       maxTokens: 3000,
+      label: `skeleton plan for "${dto.topic}"`,
     });
     const parsed = this.parseJson(raw) as Partial<ProjectSkeleton>;
 
@@ -184,7 +186,8 @@ Description: ${step.description ?? ''}
 Files to produce: ${JSON.stringify(step.files)}`;
 
     const raw = await this.openRouterService.chat(STEP_DETAIL_SYSTEM_PROMPT, userPrompt, {
-      maxTokens: 4000,
+      maxTokens: 6000,
+      label: `step ${step.stepNumber} ("${step.title}")`,
     });
     const parsed = this.parseJson(raw) as Partial<StepDetail>;
 

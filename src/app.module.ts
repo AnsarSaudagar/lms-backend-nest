@@ -11,6 +11,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { RedisCacheModule } from './infrastructure/cache/cache.module';
+import { QueueModule } from './infrastructure/queue/bull.module';
 import { ErrorLoggerModule } from './infrastructure/error-logger/error-logger.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { CategoriesModule } from './modules/categories/categories.module';
@@ -32,6 +33,7 @@ import { ContentGeneratorModule } from './modules/content-generator/content-gene
     UsersModule,
     DatabaseModule,
     RedisCacheModule,
+    QueueModule,
     ErrorLoggerModule,
     CoursesModule,
     CategoriesModule,

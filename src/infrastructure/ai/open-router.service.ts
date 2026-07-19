@@ -38,10 +38,12 @@ export class OpenRouterService {
   async chat(
     systemPrompt: string,
     userPrompt: string,
-    opts: { maxTokens?: number; retries?: number } = {},
+    opts: { maxTokens?: number; retries?: number; label?: string } = {},
   ): Promise<string> {
-    const maxTokens = opts.maxTokens ?? 4000;
     const retries = opts.retries ?? 2;
+    const label = opts.label ?? 'request';
+    let maxTokens = opts.maxTokens ?? 4000;
+    const maxTokensCeiling = maxTokens * 2;
 
     for (let attempt = 0; ; attempt++) {
       const response = await fetch(OPEN_ROUTER_URL, {
@@ -72,11 +74,15 @@ export class OpenRouterService {
         const finishReason = data?.choices?.[0]?.finish_reason;
 
         if (!content || typeof content !== 'string') {
-          throw new InternalServerErrorException('OpenRouter returned an empty response');
+          throw new InternalServerErrorException(`OpenRouter returned an empty response for ${label}`);
         }
         if (finishReason === 'length') {
+          if (maxTokens < maxTokensCeiling) {
+            maxTokens *= 2;
+            continue;
+          }
           throw new InternalServerErrorException(
-            'AI response was cut off before finishing (hit the token limit). Try a narrower topic or fewer steps.',
+            `AI response for ${label} was cut off before finishing, even after doubling the token limit to ${maxTokens}. Try a narrower topic or fewer steps.`,
           );
         }
         return content;
@@ -90,7 +96,7 @@ export class OpenRouterService {
       }
 
       throw new InternalServerErrorException(
-        `OpenRouter request failed (${response.status}): ${body}`,
+        `OpenRouter request failed for ${label} (${response.status}): ${body}`,
       );
     }
   }
