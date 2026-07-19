@@ -19,6 +19,7 @@ import { PurchasesModule } from './modules/purchases/purchases.module';
 import { ProgressModule } from './modules/progress/progress.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { CartModule } from './modules/cart/cart.module';
+import { ContentGeneratorModule } from './modules/content-generator/content-generator.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { CartModule } from './modules/cart/cart.module';
     ProgressModule,
     DashboardModule,
     CartModule,
+    ContentGeneratorModule,
   ],
   controllers: [AppController],
   providers: [

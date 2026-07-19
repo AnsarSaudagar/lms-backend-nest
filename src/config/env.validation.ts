@@ -17,6 +17,8 @@ export const envValidationSchema = Joi.object({
   JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
 
   GEMINI_API_KEY: Joi.string().required(),
+  OPEN_ROUTER_API_KEY: Joi.string().required(),
+  OPEN_ROUTER_MODEL: Joi.string().required(),
 
   CLOUDINARY_CLOUD_NAME: Joi.string().required(),
   CLOUDINARY_API_KEY: Joi.string().required(),
