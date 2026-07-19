@@ -24,7 +24,7 @@ export class ContentGeneratorProcessor extends WorkerHost {
 
   async process(job: Job<GenerateProjectDto>) {
     this.logger.log(`Generating project for topic "${job.data.topic}" (job ${job.id})`);
-    return this.contentGeneratorService.generateProject(job.data);
+    return this.contentGeneratorService.generateProject(job.data, String(job.id));
   }
 
   @OnWorkerEvent('active')

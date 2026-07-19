@@ -52,6 +52,26 @@ export class GenerationHistoryService {
     );
   }
 
+  /** Appends one line to the job's live progress log — the frontend polls this for a step-by-step view. */
+  async appendLog(jobId: string, message: string) {
+    await this.generationJobModel.updateOne(
+      { jobId },
+      { $push: { logs: { at: new Date(), message } } },
+    );
+  }
+
+  /** Records which model actually answered, so a fallback switch away from the primary is visible. */
+  async setModel(jobId: string, model: string, primaryModel: string) {
+    await this.generationJobModel.updateOne({ jobId }, { currentModel: model });
+    if (model !== primaryModel) {
+      await this.appendLog(jobId, `Model switched to "${model}" (primary "${primaryModel}" unavailable/rate-limited)`);
+    }
+  }
+
+  async setStepsCompleted(jobId: string, stepsCompleted: number) {
+    await this.generationJobModel.updateOne({ jobId }, { stepsCompleted });
+  }
+
   async listHistory(requestedBy?: string): Promise<GenerationJobDocument[]> {
     const filter = requestedBy ? { requestedBy } : {};
     return this.generationJobModel.find(filter).sort({ createdAt: -1 }).exec();

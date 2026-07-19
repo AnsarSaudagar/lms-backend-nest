@@ -6,6 +6,16 @@ import { GENERATION_JOB_STATUS, type GenerationJobStatus } from '../content-gene
 
 export type GenerationJobDocument = HydratedDocument<GenerationJob>;
 
+@Schema({ _id: false })
+export class GenerationLogEntry {
+  @Prop({ type: Date, default: () => new Date() })
+  at!: Date;
+
+  @Prop({ type: String, required: true })
+  message!: string;
+}
+export const GenerationLogEntrySchema = SchemaFactory.createForClass(GenerationLogEntry);
+
 @Schema({ timestamps: true, versionKey: false })
 export class GenerationJob {
   @Prop({ required: true, unique: true, index: true })
@@ -34,6 +44,15 @@ export class GenerationJob {
 
   @Prop({ type: Number, default: null })
   stepCount!: number | null;
+
+  @Prop({ type: Number, default: 0 })
+  stepsCompleted!: number;
+
+  @Prop({ type: String, default: null })
+  currentModel!: string | null;
+
+  @Prop({ type: [GenerationLogEntrySchema], default: [] })
+  logs!: GenerationLogEntry[];
 
   @Prop({ type: String, default: null })
   errorMessage!: string | null;

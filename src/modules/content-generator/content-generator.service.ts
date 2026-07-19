@@ -7,6 +7,7 @@ import { OpenRouterService } from 'src/infrastructure/ai/open-router.service';
 import { ProjectsService } from '../projects/projects.service';
 import { ImportProjectDto } from '../projects/dtos/import-project.dto';
 import { GenerateProjectDto } from './dtos/generate-project.dto';
+import { GenerationHistoryService } from './generation-history.service';
 import { PROJECT_CATEGORY, PROJECT_DIFFICULTY, CODE_BLOCK_ACTION } from 'src/common/constants/project.constant';
 
 interface FileHint {
@@ -110,11 +111,14 @@ export class ContentGeneratorService {
   constructor(
     private readonly openRouterService: OpenRouterService,
     private readonly projectsService: ProjectsService,
+    private readonly generationHistoryService: GenerationHistoryService,
   ) {}
 
-  async generateProject(dto: GenerateProjectDto) {
-    const skeleton = await this.generateSkeleton(dto);
-    const steps = await this.fillAllStepDetails(skeleton);
+  async generateProject(dto: GenerateProjectDto, jobId: string) {
+    await this.generationHistoryService.appendLog(jobId, 'Generation started');
+
+    const skeleton = await this.generateSkeleton(dto, jobId);
+    const steps = await this.fillAllStepDetails(skeleton, jobId);
 
     // isPaid/price are never requested from the AI — the caller controls
     // them directly, so they're forced onto the plan here before validation.
@@ -122,25 +126,35 @@ export class ContentGeneratorService {
       project: { ...skeleton.project, isPaid: dto.isPaid ?? false, price: dto.price ?? 0 },
       steps,
     };
+
+    await this.generationHistoryService.appendLog(jobId, 'Validating generated project against schema');
     const validated = await this.validateProject(assembled);
 
+    await this.generationHistoryService.appendLog(jobId, `Saving generated/${validated.project.slug}.json`);
     await this.saveToDisk(validated.project.slug, validated);
+
+    await this.generationHistoryService.appendLog(jobId, 'Importing project into database');
     const project = await this.projectsService.import(validated);
+
+    await this.generationHistoryService.appendLog(jobId, 'Generation completed');
     return { project, generated: validated };
   }
 
-  private async generateSkeleton(dto: GenerateProjectDto): Promise<ProjectSkeleton> {
+  private async generateSkeleton(dto: GenerateProjectDto, jobId: string): Promise<ProjectSkeleton> {
     const constraints: string[] = [`Topic: ${dto.topic}`];
     if (dto.category) constraints.push(`Category: ${dto.category}`);
     if (dto.difficulty) constraints.push(`Difficulty: ${dto.difficulty}`);
     if (dto.estimatedHours) constraints.push(`Target estimatedHours: ${dto.estimatedHours}`);
     const userPrompt = `Plan a full project tutorial for the following:\n${constraints.join('\n')}`;
 
-    const raw = await this.openRouterService.chat(SKELETON_SYSTEM_PROMPT, userPrompt, {
+    await this.generationHistoryService.appendLog(jobId, 'Generating project plan (skeleton)');
+    const { content, model } = await this.openRouterService.chat(SKELETON_SYSTEM_PROMPT, userPrompt, {
       maxTokens: 3000,
       label: `skeleton plan for "${dto.topic}"`,
     });
-    const parsed = this.parseJson(raw) as Partial<ProjectSkeleton>;
+    await this.generationHistoryService.setModel(jobId, model, this.openRouterService.primaryModel);
+
+    const parsed = this.parseJson(content) as Partial<ProjectSkeleton>;
 
     if (!parsed.project || !Array.isArray(parsed.steps) || parsed.steps.length === 0) {
       throw new InternalServerErrorException(
@@ -148,10 +162,14 @@ export class ContentGeneratorService {
       );
     }
 
+    await this.generationHistoryService.appendLog(
+      jobId,
+      `Plan ready: ${parsed.steps.length} steps outlined`,
+    );
     return parsed as ProjectSkeleton;
   }
 
-  private async fillAllStepDetails(skeleton: ProjectSkeleton) {
+  private async fillAllStepDetails(skeleton: ProjectSkeleton, jobId: string) {
     const filledSteps: Array<{
       stepNumber: number;
       title: string;
@@ -163,10 +181,16 @@ export class ContentGeneratorService {
       codeBlocks: StepDetail['codeBlocks'];
     }> = [];
 
+    const total = skeleton.steps.length;
+
     // Sequential, not parallel — spaces out requests against the same
     // free-tier rate limit instead of firing them all at once.
     for (const step of skeleton.steps) {
-      const detail = await this.fillStepDetail(skeleton.project, step);
+      await this.generationHistoryService.appendLog(
+        jobId,
+        `Generating step ${step.stepNumber}/${total}: "${step.title}"`,
+      );
+      const detail = await this.fillStepDetail(skeleton.project, step, jobId);
       filledSteps.push({
         stepNumber: step.stepNumber,
         title: step.title,
@@ -177,12 +201,18 @@ export class ContentGeneratorService {
         explanation: detail.explanation,
         codeBlocks: detail.codeBlocks,
       });
+      await this.generationHistoryService.setStepsCompleted(jobId, step.stepNumber);
+      await this.generationHistoryService.appendLog(jobId, `Step ${step.stepNumber}/${total} done`);
     }
 
     return filledSteps;
   }
 
-  private async fillStepDetail(project: Record<string, unknown>, step: StepSkeleton): Promise<StepDetail> {
+  private async fillStepDetail(
+    project: Record<string, unknown>,
+    step: StepSkeleton,
+    jobId: string,
+  ): Promise<StepDetail> {
     const userPrompt = `Project: ${project.title} (${project.category}, ${project.difficulty})
 Tech stack: ${JSON.stringify(project.techStack ?? [])}
 
@@ -190,11 +220,13 @@ Step ${step.stepNumber}: ${step.title}
 Description: ${step.description ?? ''}
 Files to produce: ${JSON.stringify(step.files)}`;
 
-    const raw = await this.openRouterService.chat(STEP_DETAIL_SYSTEM_PROMPT, userPrompt, {
+    const { content, model } = await this.openRouterService.chat(STEP_DETAIL_SYSTEM_PROMPT, userPrompt, {
       maxTokens: 6000,
       label: `step ${step.stepNumber} ("${step.title}")`,
     });
-    const parsed = this.parseJson(raw) as Partial<StepDetail>;
+    await this.generationHistoryService.setModel(jobId, model, this.openRouterService.primaryModel);
+
+    const parsed = this.parseJson(content) as Partial<StepDetail>;
 
     if (!parsed.explanation || !Array.isArray(parsed.codeBlocks)) {
       throw new InternalServerErrorException(

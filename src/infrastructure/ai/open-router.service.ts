@@ -29,8 +29,15 @@ export class OpenRouterService {
     this.models = [primary, ...FALLBACK_FREE_MODELS.filter((m) => m !== primary)].slice(0, 3);
   }
 
+  /** The primary model this instance was configured with (first in the fallback chain). */
+  get primaryModel(): string {
+    return this.models[0];
+  }
+
   /**
-   * Sends a system + user prompt pair to OpenRouter and returns the raw text reply.
+   * Sends a system + user prompt pair to OpenRouter and returns the raw text reply
+   * plus which model in the fallback chain actually answered (lets callers detect
+   * when OpenRouter silently switched away from the primary model).
    * Passes a `models` fallback chain — if the primary model is unavailable or
    * rate-limited, OpenRouter itself tries the next one in the list before erroring.
    * A local 429 retry loop sits on top for when the whole chain is briefly saturated.
@@ -39,7 +46,7 @@ export class OpenRouterService {
     systemPrompt: string,
     userPrompt: string,
     opts: { maxTokens?: number; retries?: number; label?: string } = {},
-  ): Promise<string> {
+  ): Promise<{ content: string; model: string }> {
     const retries = opts.retries ?? 2;
     const label = opts.label ?? 'request';
     let maxTokens = opts.maxTokens ?? 4000;
@@ -72,6 +79,7 @@ export class OpenRouterService {
         const data = await response.json();
         const content = data?.choices?.[0]?.message?.content;
         const finishReason = data?.choices?.[0]?.finish_reason;
+        const model = data?.model ?? this.models[0];
 
         if (!content || typeof content !== 'string') {
           throw new InternalServerErrorException(`OpenRouter returned an empty response for ${label}`);
@@ -85,7 +93,7 @@ export class OpenRouterService {
             `AI response for ${label} was cut off before finishing, even after doubling the token limit to ${maxTokens}. Try a narrower topic or fewer steps.`,
           );
         }
-        return content;
+        return { content, model };
       }
 
       const body = await response.text();
