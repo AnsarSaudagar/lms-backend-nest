@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
   IsIn,
   IsNotEmpty,
   IsNumber,
@@ -152,6 +153,17 @@ class ImportProjectMetaDto {
   @IsObject()
   @IsOptional()
   dependencies?: Record<string, unknown>;
+
+  @ApiPropertyOptional({ example: false, description: 'Defaults to false (free) if omitted' })
+  @IsBoolean()
+  @IsOptional()
+  isPaid?: boolean;
+
+  @ApiPropertyOptional({ example: 0, description: 'Defaults to 0 if omitted' })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  price?: number;
 }
 
 export class ImportProjectDto {

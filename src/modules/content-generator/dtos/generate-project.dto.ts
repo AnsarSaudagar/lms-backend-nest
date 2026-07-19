@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsBoolean, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { PROJECT_CATEGORY, PROJECT_DIFFICULTY } from 'src/common/constants/project.constant';
 
 export class GenerateProjectDto {
@@ -23,4 +23,15 @@ export class GenerateProjectDto {
   @Min(1)
   @IsOptional()
   estimatedHours?: number;
+
+  @ApiPropertyOptional({ example: false, description: 'Defaults to false (free) if omitted' })
+  @IsBoolean()
+  @IsOptional()
+  isPaid?: boolean;
+
+  @ApiPropertyOptional({ example: 499, description: 'Defaults to 0 if omitted. Ignored if isPaid is false.' })
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  price?: number;
 }

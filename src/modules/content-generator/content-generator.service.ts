@@ -116,7 +116,12 @@ export class ContentGeneratorService {
     const skeleton = await this.generateSkeleton(dto);
     const steps = await this.fillAllStepDetails(skeleton);
 
-    const assembled = { project: skeleton.project, steps };
+    // isPaid/price are never requested from the AI — the caller controls
+    // them directly, so they're forced onto the plan here before validation.
+    const assembled = {
+      project: { ...skeleton.project, isPaid: dto.isPaid ?? false, price: dto.price ?? 0 },
+      steps,
+    };
     const validated = await this.validateProject(assembled);
 
     await this.saveToDisk(validated.project.slug, validated);
