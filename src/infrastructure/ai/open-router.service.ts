@@ -35,7 +35,14 @@ export class OpenRouterService {
    * rate-limited, OpenRouter itself tries the next one in the list before erroring.
    * A local 429 retry loop sits on top for when the whole chain is briefly saturated.
    */
-  async chat(systemPrompt: string, userPrompt: string, retries = 2): Promise<string> {
+  async chat(
+    systemPrompt: string,
+    userPrompt: string,
+    opts: { maxTokens?: number; retries?: number } = {},
+  ): Promise<string> {
+    const maxTokens = opts.maxTokens ?? 4000;
+    const retries = opts.retries ?? 2;
+
     for (let attempt = 0; ; attempt++) {
       const response = await fetch(OPEN_ROUTER_URL, {
         method: 'POST',
@@ -52,6 +59,7 @@ export class OpenRouterService {
             { role: 'user', content: userPrompt },
           ],
           temperature: 0.4,
+          max_tokens: maxTokens,
           // Venice's free-tier capacity is frequently exhausted across
           // multiple :free models — route around it so fallbacks actually help.
           provider: { ignore: ['Venice'] },
@@ -61,9 +69,15 @@ export class OpenRouterService {
       if (response.ok) {
         const data = await response.json();
         const content = data?.choices?.[0]?.message?.content;
+        const finishReason = data?.choices?.[0]?.finish_reason;
 
         if (!content || typeof content !== 'string') {
           throw new InternalServerErrorException('OpenRouter returned an empty response');
+        }
+        if (finishReason === 'length') {
+          throw new InternalServerErrorException(
+            'AI response was cut off before finishing (hit the token limit). Try a narrower topic or fewer steps.',
+          );
         }
         return content;
       }
