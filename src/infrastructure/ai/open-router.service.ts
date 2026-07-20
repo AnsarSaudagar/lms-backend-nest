@@ -98,6 +98,14 @@ export class OpenRouterService {
 
       const body = await response.text();
 
+      // Account-wide daily quota, not a per-request/per-model rate limit —
+      // retrying or falling back to another model can't help until it resets.
+      if (response.status === 429 && /free-models-per-day/i.test(body)) {
+        throw new InternalServerErrorException(
+          `OpenRouter free-tier daily quota exhausted for ${label}. Wait for the daily reset or add credits at https://openrouter.ai/settings/credits to raise the limit.`,
+        );
+      }
+
       if (response.status === 429 && attempt < retries) {
         await new Promise((resolve) => setTimeout(resolve, this.getRetryDelayMs(response, body)));
         continue;

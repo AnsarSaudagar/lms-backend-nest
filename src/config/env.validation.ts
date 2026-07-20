@@ -18,7 +18,7 @@ export const envValidationSchema = Joi.object({
 
   GEMINI_API_KEY: Joi.string().required(),
   OPEN_ROUTER_API_KEY: Joi.string().required(),
-  OPEN_ROUTER_MODEL: Joi.string().required(),
+  OPEN_ROUTER_MODEL: Joi.string().default('openrouter/free'),
 
   CLOUDINARY_CLOUD_NAME: Joi.string().required(),
   CLOUDINARY_API_KEY: Joi.string().required(),
