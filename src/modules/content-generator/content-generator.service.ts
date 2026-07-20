@@ -78,8 +78,9 @@ Output ONLY raw JSON — no markdown code fences, no commentary before or after.
 }
 
 Rules:
-- Produce between 8 and 15 steps, ordered and numbered starting at 1.
+- Produce between 6 and 10 steps, ordered and numbered starting at 1.
 - Each step should take 5-15 minutes to complete.
+- Keep "description", "expectedOutput", and each "troubleshooting" entry to ONE short sentence — this is just a plan, not the full tutorial.
 - "files" lists every file that step's code will touch — leave "files": [] for steps with no code (e.g. a final testing/review step).
 - "slug" must be lowercase kebab-case, derived from the title.`;
 
@@ -148,13 +149,10 @@ export class ContentGeneratorService {
     const userPrompt = `Plan a full project tutorial for the following:\n${constraints.join('\n')}`;
 
     await this.generationHistoryService.appendLog(jobId, 'Generating project plan (skeleton)');
-    const { content, model } = await this.openRouterService.chat(SKELETON_SYSTEM_PROMPT, userPrompt, {
+    const parsed = (await this.chatAndParseJson(SKELETON_SYSTEM_PROMPT, userPrompt, jobId, {
       maxTokens: 3000,
       label: `skeleton plan for "${dto.topic}"`,
-    });
-    await this.generationHistoryService.setModel(jobId, model, this.openRouterService.primaryModel);
-
-    const parsed = this.parseJson(content) as Partial<ProjectSkeleton>;
+    })) as Partial<ProjectSkeleton>;
 
     if (!parsed.project || !Array.isArray(parsed.steps) || parsed.steps.length === 0) {
       throw new InternalServerErrorException(
@@ -220,13 +218,10 @@ Step ${step.stepNumber}: ${step.title}
 Description: ${step.description ?? ''}
 Files to produce: ${JSON.stringify(step.files)}`;
 
-    const { content, model } = await this.openRouterService.chat(STEP_DETAIL_SYSTEM_PROMPT, userPrompt, {
+    const parsed = (await this.chatAndParseJson(STEP_DETAIL_SYSTEM_PROMPT, userPrompt, jobId, {
       maxTokens: 6000,
       label: `step ${step.stepNumber} ("${step.title}")`,
-    });
-    await this.generationHistoryService.setModel(jobId, model, this.openRouterService.primaryModel);
-
-    const parsed = this.parseJson(content) as Partial<StepDetail>;
+    })) as Partial<StepDetail>;
 
     if (!parsed.explanation || !Array.isArray(parsed.codeBlocks)) {
       throw new InternalServerErrorException(
@@ -237,7 +232,41 @@ Files to produce: ${JSON.stringify(step.files)}`;
     return parsed as StepDetail;
   }
 
-  private parseJson(raw: string): unknown {
+  /**
+   * openrouter/free draws a random free model per call — occasionally that's
+   * a model unsuited to this task (e.g. a safety/moderation classifier) that
+   * ignores the JSON instruction entirely. One retry re-rolls the draw before
+   * giving up, since the failure isn't a rate limit/length issue chat() would
+   * already retry — the call "succeeds" with junk content.
+   */
+  private async chatAndParseJson(
+    systemPrompt: string,
+    userPrompt: string,
+    jobId: string,
+    opts: { maxTokens: number; label: string },
+  ): Promise<unknown> {
+    for (let attempt = 0; ; attempt++) {
+      const { content, model } = await this.openRouterService.chat(systemPrompt, userPrompt, opts);
+      await this.generationHistoryService.setModel(jobId, model, this.openRouterService.primaryModel);
+
+      const result = this.tryParseJson(content);
+      if (result.ok) return result.value;
+
+      if (attempt === 0) {
+        await this.generationHistoryService.appendLog(
+          jobId,
+          `Model "${model}" returned invalid output for ${opts.label}, retrying with a different model`,
+        );
+        continue;
+      }
+
+      throw new InternalServerErrorException(
+        `AI returned malformed JSON for ${opts.label} even after a retry. Try again or refine the topic. Last 300 chars of output: ${result.tail}`,
+      );
+    }
+  }
+
+  private tryParseJson(raw: string): { ok: true; value: unknown } | { ok: false; tail: string } {
     const cleaned = raw
       .trim()
       .replace(/^```(?:json)?/i, '')
@@ -245,12 +274,9 @@ Files to produce: ${JSON.stringify(step.files)}`;
       .trim();
 
     try {
-      return JSON.parse(cleaned);
+      return { ok: true, value: JSON.parse(cleaned) };
     } catch {
-      const tail = cleaned.slice(-300);
-      throw new InternalServerErrorException(
-        `AI returned malformed JSON. Try again or refine the topic. Last 300 chars of output: ${tail}`,
-      );
+      return { ok: false, tail: cleaned.slice(-300) };
     }
   }
 

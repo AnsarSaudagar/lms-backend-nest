@@ -50,7 +50,9 @@ export class OpenRouterService {
     const retries = opts.retries ?? 2;
     const label = opts.label ?? 'request';
     let maxTokens = opts.maxTokens ?? 4000;
-    const maxTokensCeiling = maxTokens * 2;
+    // openrouter/free draws a random model per call, including weaker/smaller
+    // ones — allow doubling twice (not just once) before giving up.
+    const maxTokensCeiling = maxTokens * 4;
 
     for (let attempt = 0; ; attempt++) {
       const response = await fetch(OPEN_ROUTER_URL, {
@@ -69,6 +71,10 @@ export class OpenRouterService {
           ],
           temperature: 0.4,
           max_tokens: maxTokens,
+          // Forces the model to emit a JSON object — without this, a random
+          // draw from openrouter/free's pool (e.g. a safety/moderation model)
+          // can reply with plain text instead of the JSON we asked for.
+          response_format: { type: 'json_object' },
           // Venice's free-tier capacity is frequently exhausted across
           // multiple :free models — route around it so fallbacks actually help.
           provider: { ignore: ['Venice'] },
@@ -90,7 +96,7 @@ export class OpenRouterService {
             continue;
           }
           throw new InternalServerErrorException(
-            `AI response for ${label} was cut off before finishing, even after doubling the token limit to ${maxTokens}. Try a narrower topic or fewer steps.`,
+            `AI response for ${label} was cut off before finishing, even after raising the token limit to ${maxTokens}. Try a narrower topic or fewer steps.`,
           );
         }
         return { content, model };
