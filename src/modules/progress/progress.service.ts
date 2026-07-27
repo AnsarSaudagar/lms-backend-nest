@@ -90,20 +90,23 @@ export class ProgressService {
     return progress;
   }
 
-  async getAllForUser(userId: string): Promise<UserProjectProgressDocument[]> {
-    return this.progressModel
+  async getAllForUser(
+    userId: string,
+    limit: number | null = null,
+  ): Promise<UserProjectProgressDocument[]> {
+    const query = this.progressModel
       .find({ user: userId })
-      .populate('project', 'slug title')
-      .exec();
+      .sort({ createdAt: -1 })
+      .populate('project', 'slug title');
+
+    if (limit) {
+      query.limit(limit);
+    }
+    return query.exec();
   }
 
-  async findCompletedSteps(
-    project: string,
-    user: string,
-  ): Promise<number[]> {
-    const progress = await this.progressModel
-      .findOne({ user, project })
-      .exec();
+  async findCompletedSteps(project: string, user: string): Promise<number[]> {
+    const progress = await this.progressModel.findOne({ user, project }).exec();
     return progress?.completedSteps ?? [];
   }
 

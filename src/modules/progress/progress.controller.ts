@@ -59,17 +59,4 @@ export class ProgressController {
   }
 }
 
-@ApiTags('Progress')
-@ApiBearerAuth('access-token')
-@UseGuards(JwtAuthGuard)
-@Controller('me/progress')
-export class MyProgressController {
-  constructor(private readonly progressService: ProgressService) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Get progress across all enrolled projects' })
-  @ApiResponse({ status: 200, description: 'Array of progress records.' })
-  getAll(@CurrentUser('userId') userId: string) {
-    return this.progressService.getAllForUser(userId);
-  }
-}

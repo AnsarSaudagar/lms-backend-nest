@@ -5,8 +5,9 @@ import {
   UserProjectProgressSchema,
 } from 'src/modules/progress/schemas/user-project-progress.schema';
 import { ProgressService } from './progress.service';
-import { ProgressController, MyProgressController } from './progress.controller';
+import { ProgressController } from './progress.controller';
 import { PurchasesModule } from '../purchases/purchases.module';
+import { MyProgressController } from './my-progress.controller';
 
 @Module({
   imports: [
