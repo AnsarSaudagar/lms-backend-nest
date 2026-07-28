@@ -43,9 +43,16 @@ export class CartService {
 
   async getCart(userId: string) {
     const cart = await this.getOrCreateCart(userId);
+    
     await cart.populate('items.project', 'slug title price isPaid');
+    
+     const items = cart.items.map((item: any) => ({
+        ...(item.project?.toObject?.() ?? item.project),
+        addedAt: item.addedAt,
+      }));
+
     const total = cart.items.reduce((sum, i: any) => sum + (i.project?.price ?? 0), 0);
-    return { items: cart.items, total, currency: 'INR' };
+    return { items , total, currency: 'INR' };
   }
 
   async removeItem(userId: string, projectId: string) {
